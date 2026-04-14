@@ -1,0 +1,29 @@
+{
+    "compilerOptions": {
+      "strict": true,
+      "rootDir": "./src",
+      "outDir": "./dist",
+      "module": "commonjs",
+      "target": "ES2020",
+      "esModuleInterop": true,
+      "resolveJsonModule": true,
+      "baseUrl": ".",
+      "paths": {
+        "@entities/*": [
+          "src/entities/*"
+        ],
+        "@use-cases/*": [
+          "src/use-cases/*"
+        ],
+        "@adapters/*": [
+          "src/interface-adapters/*"
+        ],
+        "@drivers/*": [
+          "src/frameworks-and-drivers/*"
+        ]
+      }
+    },
+    "include": [
+      "src"
+    ]
+  }
