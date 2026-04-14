@@ -1,0 +1,58 @@
+ {  
+    "name": "goldcraft-backend",
+    "version": "0.0.0",
+    "private": true,
+    "scripts": {
+      "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/frameworks-and-
+  drivers/web/express/server.ts",
+      "build": "tsc"
+    },
+    "dependencies": {
+      "@aws-sdk/client-s3": "latest",
+      "@aws-sdk/s3-request-presigner": "latest",
+      "bcryptjs": "latest",
+      "cookie-parser": "latest",
+      "cors": "latest",
+      "dayjs": "latest",
+      "dotenv": "latest",
+      "express": "latest",
+      "express-mongo-sanitize": "latest",
+      "express-rate-limit": "latest",
+      "firebase-admin": "latest",
+      "helmet": "latest",
+      "hpp": "latest",
+      "ioredis": "latest",
+      "jsonwebtoken": "latest",
+      "mongoose": "latest",
+      "multer": "latest",
+      "nanoid": "latest",
+      "node-cron": "latest",
+      "nodemailer": "latest",
+      "socket.io": "latest",
+      "stripe": "latest",
+      "uuid": "latest",
+      "xss-clean": "latest",
+      "zod": "latest"
+    },
+    "devDependencies": {
+      "@types/bcryptjs": "latest",
+      "@types/cookie-parser": "latest",
+      "@types/cors": "latest",
+      "@types/express": "latest",
+      "@types/express-mongo-sanitize": "latest",
+      "@types/express-rate-limit": "latest",
+      "@types/helmet": "latest",
+      "@types/hpp": "latest",
+      "@types/jsonwebtoken": "latest",
+      "@types/multer": "latest",
+      "@types/node": "latest",
+      "@types/node-cron": "latest",
+      "@types/nodemailer": "latest",
+      "@types/socket.io": "latest",
+      "@types/uuid": "latest",
+      "@types/xss-clean": "latest",
+      "ts-node-dev": "latest",
+      "tsconfig-paths": "latest",
+      "typescript": "latest"
+    }
+  }
