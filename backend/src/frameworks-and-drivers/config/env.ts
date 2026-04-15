@@ -1,22 +1,21 @@
-import "dotenv/config"
-import {z} from "zod"
+import "dotenv/config";
+import { z } from "zod";
 
-const requiredString= (key:string)=>
-    z.preprocess(
-        (value)=>(value == null?"":value),
-        z.string().trim().min(1,`${key} is required`,)
-    )
+const requiredString = (key: string) =>
+  z.preprocess(
+    (value) => (value == null ? "" : value),
+    z.string().trim().min(1, `${key} is required.`),
+  );
 
-const requiredPositiveInt=(key:string)=>
-    requiredString(key)
-.refine((value)=>!Number.isNaN(Number(value)),'${key} must be a number.')
-.transform((value)=>Number(value))
-.refine((value)=>Number.isInteger(value),`${key} must be an integer.`)
-.refine((value)=>value>0.`${key} must be greater than 0`)
+const requiredPositiveInt = (key: string) =>
+  requiredString(key)
+    .refine((value) => !Number.isNaN(Number(value)), `${key} must be a number.`)
+    .transform((value) => Number(value))
+    .refine((value) => Number.isInteger(value), `${key} must be an integer.`)
+    .refine((value) => value > 0, `${key} must be greater than 0.`);
 
-
-const envSchema=z.obeject({
-    MONGODB_URI: requiredString("MONGODB_URI"),
+const envSchema = z.object({
+  MONGODB_URI: requiredString("MONGODB_URI"),
   REDIS_URL: requiredString("REDIS_URL"),
   AWS_ACCESS_KEY_ID: requiredString("AWS_ACCESS_KEY_ID"),
   AWS_SECRET_ACCESS_KEY: requiredString("AWS_SECRET_ACCESS_KEY"),
@@ -42,12 +41,12 @@ const envSchema=z.obeject({
   JWT_REFRESH_EXPIRY: requiredString("JWT_REFRESH_EXPIRY"),
   CORS_ORIGIN: requiredString("CORS_ORIGIN"),
   PORT: requiredPositiveInt("PORT"),
-  NODE_ENV:z
-  .preprocess(
-    (value)=>(value===null?"":value),
-    z.string().trim().min(1,"NODE_ENV is required."),
-  )
-  .refine(
+  NODE_ENV: z
+    .preprocess(
+      (value) => (value == null ? "" : value),
+      z.string().trim().min(1, "NODE_ENV is required."),
+    )
+    .refine(
       (value) =>
         value === "development" || value === "test" || value === "production",
       "NODE_ENV must be development, test, or production.",
@@ -56,7 +55,7 @@ const envSchema=z.obeject({
   OTP_MAX_ATTEMPTS: requiredPositiveInt("OTP_MAX_ATTEMPTS"),
   RESET_TOKEN_TTL_SECONDS: requiredPositiveInt("RESET_TOKEN_TTL_SECONDS"),
   RESET_MAX_ATTEMPTS: requiredPositiveInt("RESET_MAX_ATTEMPTS"),
-})
+});
 
 const parsedEnv = envSchema.safeParse(process.env);
 
