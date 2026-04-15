@@ -1,6 +1,3 @@
-import { log } from './../../../node_modules/@grpc/grpc-js/src/logging';
-import { Long } from './../../../node_modules/bson/src/long';
-import { connector } from './../../../../frontend/node_modules/undici-types/connector.d';
 import { env } from "../config/env"
 import mongoose from "mongoose"
 
