@@ -1,28 +1,23 @@
 {
-    "name": "goldcraft-frontend",
-    "version": "0.0.0",
-    "private": true,
-    "scripts": {
-      "dev": "vite",
-      "build": "tsc && vite build",
-      "preview": "vite preview"
-    },
-    "dependencies": {
-      "@tanstack/react-query": "latest",
-      "axios": "latest",
-      "clsx": "latest",
-      "dayjs": "latest",
-      "lucide-react": "latest",
-      "react": "18",
-      "react-dom": "18",
-      "react-router-dom": "6"
-    },
-    "devDependencies": {
-      "@types/node": "latest",
-      "@types/react": "latest",
-      "@types/react-dom": "latest",
-      "@vitejs/plugin-react": "latest",
-      "typescript": "latest",
-      "vite": "latest"
-    }
+  "name": "rewrite-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.27.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.11",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.2",
+    "typescript": "^5.6.2",
+    "vite": "^5.4.8"
   }
+}
+

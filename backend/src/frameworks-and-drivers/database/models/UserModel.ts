@@ -1,85 +1,35 @@
-import { Document, Model, Schema, model, models } from "mongoose";
+import { Schema, model } from "mongoose";
 
-export interface UserDocument extends Document {
-  name: string;
-  email: string;
-  passwordHash: string;
-  role: "admin" | "jeweller";
-  isActive: boolean;
-  isEmailVerified: boolean;
-  fcmToken?: string;
-  lastLoginAt?: Date;
-  passwordChangedAt?: Date;
-  authVersion: number;
-  referralCode: string;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-const userSchema = new Schema<UserDocument>(
+const userSchema = new Schema(
   {
     name: {
       type: String,
       required: true,
       trim: true,
-      minlength: 2,
-      maxlength: 100,
     },
     email: {
       type: String,
       required: true,
-      trim: true,
+      unique: true,
       lowercase: true,
-      maxlength: 254,
+      trim: true,
     },
     passwordHash: {
       type: String,
       required: true,
-      select: false,
     },
     role: {
       type: String,
-      enum: ["admin", "jeweller"],
-      required: true,
+      enum: ["jeweller", "admin"],
       default: "jeweller",
     },
-    isActive: {
-      type: Boolean,
-      default: true,
-    },
-    isEmailVerified: {
-      type: Boolean,
-      default: false,
-    },
-    fcmToken: {
-      type: String,
-      trim: true,
-    },
-    lastLoginAt: Date,
-    passwordChangedAt: Date,
-    authVersion: {
-      type: Number,
-      default: 0,
-      min: 0,
-    },
-    referralCode: {
-      type: String,
-      required: true,
-      trim: true,
+    lastLoginAt: {
+      type: Date,
+      default: null,
     },
   },
-  {
-    collection: "users",
-    timestamps: true,
-  },
+  { timestamps: true },
 );
 
-userSchema.index({ email: 1 }, { unique: true });
-userSchema.index({ role: 1, isActive: 1 });
-userSchema.index({ referralCode: 1 }, { unique: true });
+export const UserModel = model("User", userSchema);
 
-export const UserModel =
-  (models.User as Model<UserDocument> | undefined) ||
-  model<UserDocument>("User", userSchema);
-
-export default UserModel;

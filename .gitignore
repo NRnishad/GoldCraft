@@ -20,3 +20,6 @@ pnpm-debug.log*
 # OS/editor noise
 .DS_Store
 Thumbs.db
+
+# Local project planning notes
+/PROJECT_CONTEXT.md
