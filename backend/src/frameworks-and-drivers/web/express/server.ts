@@ -1,17 +1,18 @@
-import { env } from "../../config/env";
+import { createApp } from "./app";
 import { connectDatabase } from "../../database/connection";
-import { app } from "./app";
+import { env } from "../../config/env";
 
-async function startServer() {
+async function bootstrap() {
   await connectDatabase();
 
+  const app = createApp();
+
   app.listen(env.PORT, () => {
-    console.log(`Backend running on http://localhost:${env.PORT}`);
+    console.log(`Server running on port ${env.PORT}`);
   });
 }
 
-startServer().catch((error) => {
-  console.error("Failed to start backend", error);
+bootstrap().catch((error) => {
+  console.error("Failed to start server", error);
   process.exit(1);
 });
-

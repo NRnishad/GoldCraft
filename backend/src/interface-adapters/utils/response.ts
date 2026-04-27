@@ -1,10 +1,14 @@
-import type { Response } from "express";
+import { Response } from "express";
 
 export function sendSuccess(
   res: Response,
   message: string,
-  data: Record<string, unknown>,
+  data?: unknown,
+  statusCode = 200,
 ) {
-  res.json({ success: true, message, data });
+  return res.status(statusCode).json({
+    success: true,
+    message,
+    data,
+  });
 }
-

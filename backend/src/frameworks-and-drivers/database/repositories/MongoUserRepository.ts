@@ -1,42 +1,62 @@
-import { UserModel } from "../models/UserModel";
-import type {
-  IUserRepository,
-  LoginUser,
-  PublicUser,
-} from "../../../use-cases/auth/LoginUseCase/IUserRepository";
+import { User } from "@entities/User";
+import { IRegisterUserRepository } from "@use-cases/auth/RegisterUserUseCase/IUserRepository";
+import { ILoginUserRepository } from "@use-cases/auth/LoginUserUseCase/IUserRepository";
+import { IGetCurrentUserRepository } from "@use-cases/auth/GetCurrentUserUseCase/IUserRepository";
+import { UserModel, IUserDocument } from "../models/UserModel";
 
-function toLoginUser(doc: any): LoginUser {
-  return {
-    id: String(doc._id),
-    name: doc.name,
-    email: doc.email,
-    passwordHash: doc.passwordHash,
-    role: doc.role,
-  };
-}
+export class MongoUserRepository
+  implements
+    IRegisterUserRepository,
+    ILoginUserRepository,
+    IGetCurrentUserRepository
+{
+  async findByEmail(email: string): Promise<User | null> {
+    const user = await UserModel.findOne({ email }).exec();
 
-function toPublicUser(doc: any): PublicUser {
-  return {
-    id: String(doc._id),
-    name: doc.name,
-    email: doc.email,
-    role: doc.role,
-  };
-}
+    if (!user) {
+      return null;
+    }
 
-export class MongoUserRepository implements IUserRepository {
-  async findByEmail(email: string): Promise<LoginUser | null> {
-    const user = await UserModel.findOne({ email: email.toLowerCase() }).lean();
-    return user ? toLoginUser(user) : null;
+    return this.toEntity(user);
   }
 
-  async findById(userId: string): Promise<PublicUser | null> {
-    const user = await UserModel.findById(userId).lean();
-    return user ? toPublicUser(user) : null;
+  async findById(id: string): Promise<User | null> {
+    const user = await UserModel.findById(id).exec();
+
+    if (!user) {
+      return null;
+    }
+
+    return this.toEntity(user);
   }
 
-  async updateLastLogin(userId: string, date: Date): Promise<void> {
-    await UserModel.findByIdAndUpdate(userId, { lastLoginAt: date });
+  async create(data: {
+    name: string;
+    email: string;
+    passwordHash: string;
+    role: "jeweller";
+  }): Promise<User> {
+    const user = await UserModel.create({
+      name: data.name,
+      email: data.email,
+      passwordHash: data.passwordHash,
+      role: data.role,
+      isActive: true,
+    });
+
+    return this.toEntity(user);
+  }
+
+  private toEntity(user: IUserDocument): User {
+    return {
+      id: String(user._id),
+      name: user.name,
+      email: user.email,
+      passwordHash: user.passwordHash,
+      role: user.role,
+      isActive: user.isActive,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    };
   }
 }
-

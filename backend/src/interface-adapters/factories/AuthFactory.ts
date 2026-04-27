@@ -1,16 +1,28 @@
-import { MongoUserRepository } from "../../frameworks-and-drivers/database/repositories/MongoUserRepository";
-import { BcryptPasswordHasher } from "../../frameworks-and-drivers/security/BcryptPasswordHasher";
-import { LoginUseCase } from "../../use-cases/auth/LoginUseCase/LoginUseCase";
+import { MongoUserRepository } from "@drivers/database/repositories/MongoUserRepository";
+import { BcryptPasswordHasher } from "@drivers/security/BcryptPasswordHasher";
+import { JwtTokenService } from "@drivers/security/JwtTokenService";
 
-export function makeUserRepository() {
-  return new MongoUserRepository();
+import { RegisterUserUseCase } from "@use-cases/auth/RegisterUserUseCase/RegisterUserUseCase";
+import { LoginUserUseCase } from "@use-cases/auth/LoginUserUseCase/LoginUserUseCase";
+import { GetCurrentUserUseCase } from "@use-cases/auth/GetCurrentUserUseCase/GetCurrentUserUseCase";
+
+export function makeRegisterUserUseCase() {
+  const userRepository = new MongoUserRepository();
+  const passwordHasher = new BcryptPasswordHasher();
+
+  return new RegisterUserUseCase(userRepository, passwordHasher);
 }
 
-export function makePasswordHasher() {
-  return new BcryptPasswordHasher();
+export function makeLoginUserUseCase() {
+  const userRepository = new MongoUserRepository();
+  const passwordHasher = new BcryptPasswordHasher();
+  const tokenService = new JwtTokenService();
+
+  return new LoginUserUseCase(userRepository, passwordHasher, tokenService);
 }
 
-export function makeLoginUseCase() {
-  return new LoginUseCase(makeUserRepository(), makePasswordHasher());
-}
+export function makeGetCurrentUserUseCase() {
+  const userRepository = new MongoUserRepository();
 
+  return new GetCurrentUserUseCase(userRepository);
+}

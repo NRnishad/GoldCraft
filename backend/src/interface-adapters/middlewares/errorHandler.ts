@@ -1,22 +1,25 @@
-import type { ErrorRequestHandler } from "express";
+import { NextFunction, Request, Response } from "express";
 import { AppError } from "../utils/AppError";
 
-export const errorHandler: ErrorRequestHandler = (error, _req, res, _next) => {
+export function errorHandler(
+  error: Error,
+  _req: Request,
+  res: Response,
+  _next: NextFunction,
+) {
   if (error instanceof AppError) {
-    res.status(error.statusCode).json({
+    return res.status(error.statusCode).json({
       success: false,
       message: error.message,
-      code: error.code,
+      error: error.code,
     });
-    return;
   }
 
   console.error(error);
 
-  res.status(500).json({
+  return res.status(500).json({
     success: false,
     message: "Internal server error",
-    code: "INTERNAL_SERVER_ERROR",
+    error: "INTERNAL_ERROR",
   });
-};
-
+}

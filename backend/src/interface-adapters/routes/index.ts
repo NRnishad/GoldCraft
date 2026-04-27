@@ -1,13 +1,8 @@
 import { Router } from "express";
-import { authRoutes } from "./authRoutes";
+import authRoutes from "./authRoutes";
 
 const router = Router();
 
-router.get("/health", (_req, res) => {
-  res.json({ status: "ok" });
-});
+router.use("/auth", authRoutes);
 
-router.use("/api/auth", authRoutes);
-
-export const routes = router;
-
+export default router;
