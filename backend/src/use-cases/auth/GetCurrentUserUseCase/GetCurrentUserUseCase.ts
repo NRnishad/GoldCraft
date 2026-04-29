@@ -24,6 +24,7 @@ export class GetCurrentUserUseCase {
         name: user.name,
         email: user.email,
         role: user.role,
+        isEmailVerified: user.isEmailVerified,
       },
     };
   }

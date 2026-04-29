@@ -1,10 +1,11 @@
 import { createApp } from "./app";
 import { connectDatabase } from "../../database/connection";
+import { checkRedisConnection } from "@drivers/otp/checkRedisConnection";
 import { env } from "../../config/env";
 
 async function bootstrap() {
   await connectDatabase();
-
+  await checkRedisConnection();
   const app = createApp();
 
   app.listen(env.PORT, () => {

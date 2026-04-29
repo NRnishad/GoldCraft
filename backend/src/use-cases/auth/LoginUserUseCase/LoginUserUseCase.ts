@@ -36,6 +36,10 @@ export class LoginUserUseCase {
       throw new Error("INVALID_CREDENTIALS");
     }
 
+    if (!user.isEmailVerified) {
+      throw new Error("EMAIL_NOT_VERIFIED");
+    }
+
     const accessToken = this.tokenService.signAccessToken({
       userId: user.id,
       role: user.role,
@@ -48,6 +52,7 @@ export class LoginUserUseCase {
         name: user.name,
         email: user.email,
         role: user.role,
+        isEmailVerified: user.isEmailVerified,
       },
     };
   }

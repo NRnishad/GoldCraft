@@ -7,6 +7,7 @@ export interface User {
   passwordHash: string;
   role: UserRole;
   isActive: boolean;
+  isEmailVerified: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
