@@ -1,6 +1,11 @@
 import { MongoUserRepository } from "@drivers/database/repositories/MongoUserRepository";
 import { BcryptPasswordHasher } from "@drivers/security/BcryptPasswordHasher";
 import { JwtTokenService } from "@drivers/security/JwtTokenService";
+import { RedisRefreshSessionStore } from "@drivers/session/RedisRefreshSessionStore";
+import { SessionIdGenerator } from "@drivers/security/SessionIdGenerator";
+
+import { RefreshTokenUseCase } from "@use-cases/auth/RefreshTokenUseCase/RefreshTokenUseCase";
+import { LogoutUseCase } from "@use-cases/auth/LogoutUseCase/LogoutUseCase";
 import { UpstashEmailOtpStore } from "@drivers/otp/UpstashEmailOtpStore";
 import { UpstashPasswordResetOtpStore } from "@drivers/otp/UpstashPasswordResetOtpStore";
 import { OtpGenerator } from "@drivers/otp/OtpGenerator";
@@ -34,8 +39,16 @@ export function makeLoginUserUseCase() {
   const userRepository = new MongoUserRepository();
   const passwordHasher = new BcryptPasswordHasher();
   const tokenService = new JwtTokenService();
+  const refreshSessionStore = new RedisRefreshSessionStore();
+  const sessionIdGenerator = new SessionIdGenerator();
 
-  return new LoginUserUseCase(userRepository, passwordHasher, tokenService);
+  return new LoginUserUseCase(
+    userRepository,
+    passwordHasher,
+    tokenService,
+    refreshSessionStore,
+    sessionIdGenerator,
+  );
 }
 
 export function makeGetCurrentUserUseCase() {
@@ -63,6 +76,25 @@ export function makeResendEmailVerificationUseCase() {
     emailService,
     otpGenerator,
   );
+}
+
+export function makeRefreshTokenUseCase() {
+  const tokenService = new JwtTokenService();
+  const refreshSessionStore = new RedisRefreshSessionStore();
+  const userRepository = new MongoUserRepository();
+
+  return new RefreshTokenUseCase(
+    tokenService,
+    refreshSessionStore,
+    userRepository,
+  );
+}
+
+export function makeLogoutUseCase() {
+  const tokenService = new JwtTokenService();
+  const refreshSessionStore = new RedisRefreshSessionStore();
+
+  return new LogoutUseCase(tokenService, refreshSessionStore);
 }
 
 export function makeForgotPasswordUseCase() {

@@ -3,8 +3,10 @@ import mongoose, { Document, Model, Schema } from "mongoose";
 export interface IUserDocument extends Document {
   name: string;
   email: string;
-  passwordHash: string;
+  passwordHash?: string;
   role: "jeweller" | "admin";
+  authProvider: "local" | "google";
+  googleId?: string;
   isActive: boolean;
   isEmailVerified: boolean;
   createdAt: Date;
@@ -28,12 +30,22 @@ const UserSchema = new Schema<IUserDocument>(
     },
     passwordHash: {
       type: String,
-      required: true,
+      required: false,
     },
     role: {
       type: String,
       enum: ["jeweller", "admin"],
       default: "jeweller",
+    },
+    authProvider: {
+      type: String,
+      enum: ["local", "google"],
+      default: "local",
+    },
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true,
     },
     isActive: {
       type: Boolean,

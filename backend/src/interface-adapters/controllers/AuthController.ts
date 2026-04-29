@@ -6,6 +6,8 @@ import {
   makeResendEmailVerificationUseCase,
   makeVerifyEmailUseCase,makeForgotPasswordUseCase,
 makeResetPasswordUseCase,
+makeRefreshTokenUseCase,
+makeLogoutUseCase,
 } from "../factories/AuthFactory";
 import {
   loginSchema,
@@ -13,6 +15,7 @@ import {
   resendEmailVerificationSchema,
   verifyEmailSchema,forgotPasswordSchema,
 resetPasswordSchema,
+refreshTokenSchema,
 } from "../validators/authValidators";
 import { sendSuccess } from "../utils/response";
 import { AppError } from "../utils/AppError";
@@ -204,6 +207,72 @@ async resetPassword(req: Request, res: Response) {
 
     if (error instanceof Error && error.message === "INVALID_OTP") {
       throw new AppError("Invalid OTP", 400, "INVALID_OTP");
+    }
+
+    throw error;
+  }
+},
+
+async refreshToken(req: Request, res: Response) {
+  const input = refreshTokenSchema.parse(req.body);
+
+  const useCase = makeRefreshTokenUseCase();
+
+  try {
+    const result = await useCase.execute(input);
+
+    return sendSuccess(res, "Access token refreshed successfully", result);
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message === "INVALID_REFRESH_TOKEN"
+    ) {
+      throw new AppError(
+        "Invalid or expired refresh token",
+        401,
+        "INVALID_REFRESH_TOKEN",
+      );
+    }
+
+    if (error instanceof Error && error.message === "SESSION_NOT_FOUND") {
+      throw new AppError(
+        "Session expired. Please login again",
+        401,
+        "SESSION_NOT_FOUND",
+      );
+    }
+
+    if (error instanceof Error && error.message === "USER_NOT_FOUND") {
+      throw new AppError("User not found", 404, "USER_NOT_FOUND");
+    }
+
+    if (error instanceof Error && error.message === "USER_INACTIVE") {
+      throw new AppError("User account is inactive", 403, "USER_INACTIVE");
+    }
+
+    throw error;
+  }
+},
+
+async logout(req: Request, res: Response) {
+  const input = refreshTokenSchema.parse(req.body);
+
+  const useCase = makeLogoutUseCase();
+
+  try {
+    const result = await useCase.execute(input);
+
+    return sendSuccess(res, "Logged out successfully", result);
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message === "INVALID_REFRESH_TOKEN"
+    ) {
+      throw new AppError(
+        "Invalid or expired refresh token",
+        401,
+        "INVALID_REFRESH_TOKEN",
+      );
     }
 
     throw error;
