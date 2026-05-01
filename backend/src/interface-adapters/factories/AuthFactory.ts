@@ -19,6 +19,10 @@ import { ResendEmailVerificationUseCase } from "@use-cases/auth/ResendEmailVerif
 import { ForgotPasswordUseCase } from "@use-cases/auth/ForgotPasswordUseCase/ForgotPasswordUseCase";
 import { ResetPasswordUseCase } from "@use-cases/auth/ResetPasswordUseCase/ResetPasswordUseCase";
 
+import { GoogleOAuthService } from "@drivers/oauth/GoogleOAuthService";
+import { ChangePasswordUseCase } from "@use-cases/auth/ChangePasswordUseCase/ChangePasswordUseCase";
+import { GoogleLoginUseCase } from "@use-cases/auth/GoogleLoginUseCase/GoogleLoginUseCase";
+
 export function makeRegisterUserUseCase() {
   const userRepository = new MongoUserRepository();
   const passwordHasher = new BcryptPasswordHasher();
@@ -108,6 +112,28 @@ export function makeForgotPasswordUseCase() {
     passwordResetOtpStore,
     emailService,
     otpGenerator,
+  );
+}
+export function makeChangePasswordUseCase() {
+  const userRepository = new MongoUserRepository();
+  const passwordHasher = new BcryptPasswordHasher();
+
+  return new ChangePasswordUseCase(userRepository, passwordHasher);
+}
+
+export function makeGoogleLoginUseCase() {
+  const googleOAuthService = new GoogleOAuthService();
+  const userRepository = new MongoUserRepository();
+  const tokenService = new JwtTokenService();
+  const refreshSessionStore = new RedisRefreshSessionStore();
+  const sessionIdGenerator = new SessionIdGenerator();
+
+  return new GoogleLoginUseCase(
+    googleOAuthService,
+    userRepository,
+    tokenService,
+    refreshSessionStore,
+    sessionIdGenerator,
   );
 }
 

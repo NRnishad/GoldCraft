@@ -16,6 +16,11 @@ import {
 import { IGetUserDetailsRepository } from "@use-cases/admin/GetUserDetailsUseCase/IUserRepository";
 import { IUpdateUserStatusRepository } from "@use-cases/admin/UpdateUserStatusUseCase/IUserRepository";
 import { IUpdateUserRoleRepository } from "@use-cases/admin/UpdateUserRoleUseCase/IUserRepository";
+import { IChangePasswordUserRepository } from "@use-cases/auth/ChangePasswordUseCase/IUserRepository";
+import {
+  CreateGoogleUserData,
+  IGoogleLoginUserRepository,
+} from "@use-cases/auth/GoogleLoginUseCase/IUserRepository";
 export class MongoUserRepository
   implements
     IRegisterUserRepository,
@@ -28,7 +33,8 @@ export class MongoUserRepository
     IRefreshTokenUserRepository,IListUsersRepository,
 IGetUserDetailsRepository,
 IUpdateUserStatusRepository,
-IUpdateUserRoleRepository
+IUpdateUserRoleRepository,IChangePasswordUserRepository,
+IGoogleLoginUserRepository
 {
   async findByEmail(email: string): Promise<User | null> {
     const user = await UserModel.findOne({ email }).exec();
@@ -74,7 +80,7 @@ IUpdateUserRoleRepository
     }).exec();
   }
 
-  async updatePassword(userId: string, passwordHash: string): Promise<void> {
+async updatePassword(userId: string, passwordHash: string): Promise<void> {
   await UserModel.findByIdAndUpdate(userId, {
     passwordHash,
   }).exec();
@@ -180,17 +186,55 @@ private buildUserListQuery(filters: CountUsersFilters) {
 
   return query;
 }
-  private toEntity(user: IUserDocument): User {
-    return {
-      id: String(user._id),
-      name: user.name,
-      email: user.email,
-      passwordHash: user.passwordHash,
-      role: user.role,
-      isActive: user.isActive,
-      isEmailVerified: user.isEmailVerified,
-      createdAt: user.createdAt,
-      updatedAt: user.updatedAt,
-    };
+async createGoogleUser(data: CreateGoogleUserData): Promise<User> {
+  const user = await UserModel.create({
+    name: data.name,
+    email: data.email.toLowerCase(),
+    googleId: data.googleId,
+    authProvider: "google",
+    role: "jeweller",
+    isActive: true,
+    isEmailVerified: true,
+  });
+
+  return this.toEntity(user);
+}
+
+async attachGoogleAccount(
+  userId: string,
+  googleId: string,
+): Promise<User | null> {
+  const user = await UserModel.findByIdAndUpdate(
+    userId,
+    {
+      googleId,
+      authProvider: "google",
+      isEmailVerified: true,
+    },
+    {
+      new: true,
+    },
+  ).exec();
+
+  if (!user) {
+    return null;
   }
+
+  return this.toEntity(user);
+}
+  private toEntity(user: IUserDocument): User {
+  return {
+    id: String(user._id),
+    name: user.name,
+    email: user.email,
+    passwordHash: user.passwordHash,
+    role: user.role,
+    authProvider: user.authProvider,
+    googleId: user.googleId,
+    isActive: user.isActive,
+    isEmailVerified: user.isEmailVerified,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
+  };
+}
 }

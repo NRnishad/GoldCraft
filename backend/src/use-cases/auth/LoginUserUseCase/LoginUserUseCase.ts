@@ -30,12 +30,13 @@ export class LoginUserUseCase {
     if (!user.isActive) {
       throw new Error("USER_INACTIVE");
     }
-
-    const isPasswordCorrect = await this.passwordHasher.compare(
-      input.password,
-      user.passwordHash,
-    );
-
+if (!user.passwordHash) {
+  throw new Error("INVALID_CREDENTIALS");
+}
+   const isPasswordCorrect = await this.passwordHasher.compare(
+  input.password,
+  user.passwordHash,
+);
     if (!isPasswordCorrect) {
       throw new Error("INVALID_CREDENTIALS");
     }

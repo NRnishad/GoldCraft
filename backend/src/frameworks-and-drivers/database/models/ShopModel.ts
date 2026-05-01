@@ -11,6 +11,8 @@ export interface IShopDocument extends Document {
   onboardingStep: number;
   createdAt: Date;
   updatedAt: Date;
+  profilePhotoKey?: string;
+profilePhotoUrl?: string;
 }
 
 const ShopSchema = new Schema<IShopDocument>(
@@ -54,6 +56,14 @@ const ShopSchema = new Schema<IShopDocument>(
       type: Number,
       default: 3,
     },
+    profilePhotoKey: {
+  type: String,
+  trim: true,
+},
+profilePhotoUrl: {
+  type: String,
+  trim: true,
+},
   },
   {
     timestamps: true,

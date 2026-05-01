@@ -42,3 +42,14 @@ export const resetPasswordSchema = z.object({
 export const refreshTokenSchema = z.object({
   refreshToken: z.string().min(1, "Refresh token is required"),
 });
+
+export const changePasswordSchema = z.object({
+  currentPassword: z.string().min(1, "Current password is required"),
+  newPassword: z
+    .string()
+    .min(8, "New password must be at least 8 characters"),
+});
+
+export const googleCallbackSchema = z.object({
+  code: z.string().min(1, "Google code is required"),
+});

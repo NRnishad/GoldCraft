@@ -8,15 +8,18 @@ import { IGetShopProfileRepository } from "@use-cases/shop/GetShopProfileUseCase
 import {
   IUpdateShopProfileRepository,
   UpdateShopProfileData,
-} from "@use-cases/shop/UpdateShopProfileUseCase/IShopRepository";
+} 
+from "@use-cases/shop/UpdateShopProfileUseCase/IShopRepository";
 import { IShopDocument, ShopModel } from "../models/ShopModel";
+import { IUpdateShopProfilePhotoRepository } from "@use-cases/shop/UpdateShopProfilePhotoUseCase/IShopRepository";
 
 export class MongoShopRepository
   implements
     IGetOnboardingStateShopRepository,
     ISaveOnboardingShopRepository,
     IGetShopProfileRepository,
-    IUpdateShopProfileRepository
+    IUpdateShopProfileRepository,
+    IUpdateShopProfilePhotoRepository
 {
   async findByOwnerUserId(ownerUserId: string): Promise<Shop | null> {
     const shop = await ShopModel.findOne({ ownerUserId }).exec();
@@ -105,20 +108,48 @@ export class MongoShopRepository
 
     return this.toEntity(shop);
   }
+  async updateProfilePhoto(input: {
+  ownerUserId: string;
+  profilePhotoKey: string;
+  profilePhotoUrl: string;
+}): Promise<Shop | null> {
+  const shop = await ShopModel.findOneAndUpdate(
+    {
+      ownerUserId: input.ownerUserId,
+    },
+    {
+      $set: {
+        profilePhotoKey: input.profilePhotoKey,
+        profilePhotoUrl: input.profilePhotoUrl,
+      },
+    },
+    {
+      new: true,
+    },
+  ).exec();
+
+  if (!shop) {
+    return null;
+  }
+
+  return this.toEntity(shop);
+}
 
   private toEntity(shop: IShopDocument): Shop {
-    return {
-      id: String(shop._id),
-      ownerUserId: String(shop.ownerUserId),
-      shopName: shop.shopName,
-      phone: shop.phone,
-      city: shop.city,
-      address: shop.address,
-      tagline: shop.tagline,
-      onboardingComplete: shop.onboardingComplete,
-      onboardingStep: shop.onboardingStep,
-      createdAt: shop.createdAt,
-      updatedAt: shop.updatedAt,
-    };
-  }
+  return {
+    id: String(shop._id),
+    ownerUserId: String(shop.ownerUserId),
+    shopName: shop.shopName,
+    phone: shop.phone,
+    city: shop.city,
+    address: shop.address,
+    tagline: shop.tagline,
+    profilePhotoKey: shop.profilePhotoKey,
+    profilePhotoUrl: shop.profilePhotoUrl,
+    onboardingComplete: shop.onboardingComplete,
+    onboardingStep: shop.onboardingStep,
+    createdAt: shop.createdAt,
+    updatedAt: shop.updatedAt,
+  };
+}
 }

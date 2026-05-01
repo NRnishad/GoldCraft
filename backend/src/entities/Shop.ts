@@ -10,4 +10,6 @@ export interface Shop {
   onboardingStep: number;
   createdAt: Date;
   updatedAt: Date;
+  profilePhotoKey?: string;
+profilePhotoUrl?: string;
 }
