@@ -1,47 +1,46 @@
 import { useEffect, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
-import {
-  ArrowRight,
-  Eye,
-  EyeOff,
-  Gem,
-  Lock,
-  Mail,
-  ShieldCheck,
-  Sparkles,
-} from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
+import { authApi } from "../api/authApi";
 import { clearAuthError, loginUser } from "../store/authSlice";
 import type { LoginInput } from "../types/authTypes";
 
-const authPoints = [
-  "Create a polished digital presence for your jewellery shop",
-  "Share offers, rates, and updates with customers faster",
-  "Keep your shop profile and marketing tools in one workspace",
-  "Built for jewellers who want a simpler way to grow online",
-];
+import "./LoginPage.css";
 
 export function LoginPage() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  const { isLoading, error } = useAppSelector((state) => state.auth);
-
-  const [showPassword, setShowPassword] = useState(false);
+  const { user, isAuthenticated, isLoading, error } = useAppSelector(
+    (state) => state.auth
+  );
 
   const [formData, setFormData] = useState<LoginInput>({
     email: "",
     password: "",
   });
 
+  const [showPassword, setShowPassword] = useState(false);
+
   useEffect(() => {
-    dispatch(clearAuthError());
-  }, [dispatch]);
+    if (!isAuthenticated || !user) {
+      return;
+    }
+
+    if (user.role === "admin") {
+      navigate("/admin/users", { replace: true });
+      return;
+    }
+
+    navigate("/shop/onboarding", { replace: true });
+  }, [isAuthenticated, user, navigate]);
 
   function handleInputChange(event: ChangeEvent<HTMLInputElement>) {
     const { name, value } = event.target;
+
+    dispatch(clearAuthError());
 
     setFormData((previousData) => ({
       ...previousData,
@@ -63,14 +62,14 @@ export function LoginPage() {
       navigate("/shop/onboarding", { replace: true });
     } catch {
       /**
-       * authSlice already stores the backend error in Redux.
-       * So we do not manually set error here.
+       * The error is already saved in Redux by authSlice.
+       * So we do not need to set another local error here.
        */
     }
   }
 
   function handleGoogleLogin() {
-    window.location.href = `${import.meta.env.VITE_API_BASE_URL}/auth/google`;
+    window.location.href = authApi.googleLoginUrl();
   }
 
   function togglePasswordVisibility() {
@@ -78,143 +77,192 @@ export function LoginPage() {
   }
 
   return (
-    <main className="auth-page">
-      <section className="auth-brand-panel">
-        <Link className="brand" to="/">
-          <span className="brand__mark">
-            <Gem size={17} />
-          </span>
+    <main className="login-page">
+      <section className="login-page__aside" aria-label="GoldCraft overview">
+        <Link to="/login" className="login-brand" aria-label="GoldCraft home">
+          <span className="login-brand__mark">G</span>
 
-          <span className="brand__text">
+          <span className="login-brand__text">
             <strong>GoldCraft</strong>
-            <small>Jewellery marketing</small>
+            <small>AI gold poster studio</small>
           </span>
         </Link>
 
-        <div className="auth-brand-panel__content">
-          <span className="auth-badge">Jewellery growth suite</span>
+        <div className="login-page__aside-content">
+          <p className="login-page__eyebrow">Gold business workspace</p>
 
-          <h2>Bring your jewellery business online with GoldCraft</h2>
+          <h1>Daily gold rate posters, generated faster.</h1>
 
           <p>
-            Set up your shop profile, manage your brand details, and prepare
-            customer-ready marketing updates from one focused workspace.
+            Create jewellery shop posters, share daily gold rate updates
           </p>
         </div>
 
-        <div className="auth-points">
-          {authPoints.map((point, index) => (
-            <article className="auth-point" key={point}>
-              {index === 1 ? <Sparkles size={18} /> : <ShieldCheck size={18} />}
-              <span>{point}</span>
-            </article>
-          ))}
+        <div className="login-page__feature-list">
+          <div className="login-page__feature-card">
+            <p>Daily gold rate update poster workflow</p>
+            <p>,</p>
+            <p>AI poster generation for jewellery businesses</p>
+          </div>
+
+          
         </div>
       </section>
 
-      <section className="auth-form-area">
-        <div className="login-panel">
-          <div className="login-panel__header">
-            <span className="auth-badge auth-badge--soft">Account login</span>
+      <section className="login-page__form-section" aria-label="Login form">
+        <div className="login-card">
+          <div className="login-card__header">
+            <Link to="/login" className="login-card__mobile-brand">
+              <span className="login-brand__mark">G</span>
+              <span>GoldCraft</span>
+            </Link>
 
-            <h1>Sign in to GoldCraft</h1>
+            <p className="login-card__eyebrow">Welcome back</p>
+
+            <h2>Sign in to your account</h2>
 
             <p>
-              Welcome back. Sign in to manage your jewellery business workspace.
+              Access your shop dashboard, gold rate poster tools, and admin
+              workspace.
             </p>
           </div>
 
-          <div className="auth-social">
-            <button
-              className="button button--soft auth-social__button"
-              onClick={handleGoogleLogin}
-              type="button"
-            >
-              <span className="auth-social__icon" aria-hidden="true">
-                G
-              </span>
-              Continue with Google
-            </button>
+          <button
+            type="button"
+            className="login-card__google-button"
+            onClick={handleGoogleLogin}
+          >
+            <span className="login-card__google-icon" aria-hidden="true">
+              G
+            </span>
+            Continue with Google
+          </button>
+
+          <div className="login-card__divider" aria-hidden="true">
+            <span>or sign in with email</span>
           </div>
 
-          <div className="auth-divider" aria-hidden="true">
-            <span>or continue with email</span>
-          </div>
+          {error && (
+            <div className="login-card__error" role="alert">
+              {error}
+            </div>
+          )}
 
           <form className="login-form" onSubmit={handleSubmit}>
-            <label className="form-field" htmlFor="email">
+            <label className="login-form__field" htmlFor="email">
               <span>Email address</span>
 
-              <div className="form-input">
-                <Mail size={18} />
-
-                <input
-                  autoComplete="email"
-                  id="email"
-                  name="email"
-                  onChange={handleInputChange}
-                  placeholder="owner@yourshop.com"
-                  required
-                  type="email"
-                  value={formData.email}
-                />
-              </div>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                value={formData.email}
+                onChange={handleInputChange}
+                placeholder="you@example.com"
+                autoComplete="email"
+                required
+              />
             </label>
 
-            <label className="form-field" htmlFor="password">
+            <label className="login-form__field" htmlFor="password">
               <span>Password</span>
 
-              <div className="form-input">
-                <Lock size={18} />
-
+              <div className="login-form__password-input">
                 <input
-                  autoComplete="current-password"
                   id="password"
                   name="password"
-                  onChange={handleInputChange}
-                  placeholder="Enter your password"
-                  required
                   type={showPassword ? "text" : "password"}
                   value={formData.password}
+                  onChange={handleInputChange}
+                  placeholder="Enter your password"
+                  autoComplete="current-password"
+                  required
                 />
 
                 <button
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                  className="password-toggle"
-                  onClick={togglePasswordVisibility}
                   type="button"
+                  className="login-form__password-toggle"
+                  onClick={togglePasswordVisibility}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
                 >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  {showPassword ? (
+                    <svg
+                      aria-hidden="true"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                    >
+                      <path
+                        d="M3 3L21 21"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                      />
+                      <path
+                        d="M10.73 5.08C11.15 5.03 11.57 5 12 5C16.97 5 20.5 8.11 22 12C21.55 13.17 20.86 14.27 19.97 15.22"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M17.53 17.53C16.02 18.47 14.16 19 12 19C7.03 19 3.5 15.89 2 12C2.69 10.21 3.83 8.62 5.32 7.42"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M9.88 9.88C9.34 10.42 9 11.17 9 12C9 13.66 10.34 15 12 15C12.83 15 13.58 14.66 14.12 14.12"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  ) : (
+                    <svg
+                      aria-hidden="true"
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                    >
+                      <path
+                        d="M2 12C3.5 8.11 7.03 5 12 5C16.97 5 20.5 8.11 22 12C20.5 15.89 16.97 19 12 19C7.03 19 3.5 15.89 2 12Z"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M12 15C13.66 15 15 13.66 15 12C15 10.34 13.66 9 12 9C10.34 9 9 10.34 9 12C9 13.66 10.34 15 12 15Z"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  )}
                 </button>
               </div>
             </label>
 
-            {error ? <p className="form-error">{error}</p> : null}
+            <div className="login-form__meta-row">
+              <Link to="/forgot-password">Forgot password?</Link>
+            </div>
 
             <button
-              className="button button--gold login-form__submit"
-              disabled={isLoading}
               type="submit"
+              className="login-form__submit"
+              disabled={isLoading}
             >
               {isLoading ? "Signing in..." : "Sign in"}
-              <ArrowRight size={18} />
             </button>
           </form>
 
-          <div className="login-links">
-            <Link className="inline-link" to="/register">
-              Need a new account? Register here
-            </Link>
-
-            <Link
-              className="inline-link"
-              to={`/forgot-password?email=${encodeURIComponent(
-                formData.email
-              )}`}
-            >
-              Forgot password?
-            </Link>
-          </div>
+          <p className="login-card__footer-text">
+            New to GoldCraft? <Link to="/register">Create an account</Link>
+          </p>
         </div>
       </section>
     </main>
