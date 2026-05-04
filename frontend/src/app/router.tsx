@@ -1,6 +1,7 @@
 import { createBrowserRouter } from "react-router-dom";
 
 import { App } from "./App";
+import { LoginPage } from "../features/auth/pages/LoginPage";
 import { ProtectedRoute } from "../shared/components/ProtectedRoute";
 import { RoleRoute } from "../shared/components/RoleRoute";
 import { AppLayout } from "../shared/components/AppLayout";
@@ -10,15 +11,6 @@ function HomePage() {
     <div>
       <h1>GoldCraft Frontend</h1>
       <p>Frontend foundation with Redux Toolkit is ready.</p>
-    </div>
-  );
-}
-
-function LoginPagePlaceholder() {
-  return (
-    <div>
-      <h1>Login Page</h1>
-      <p>We will build this real page next.</p>
     </div>
   );
 }
@@ -119,7 +111,7 @@ export const router = createBrowserRouter([
     children: [
       {
         path: "/login",
-        element: <LoginPagePlaceholder />,
+        element: <LoginPage />,
       },
       {
         path: "/register",
