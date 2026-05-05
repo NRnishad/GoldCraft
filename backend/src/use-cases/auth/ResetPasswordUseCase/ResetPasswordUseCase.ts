@@ -36,7 +36,7 @@ export class ResetPasswordUseCase {
     const savedOtp = await this.passwordResetOtpStore.get(email);
 
     if (process.env.NODE_ENV !== "production") {
-      console.log("Reset password OTP debug:", {
+      console.log("Reset password OTP :", {
         email,
         enteredOtp: otp,
         savedOtp,

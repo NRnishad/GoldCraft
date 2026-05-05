@@ -1,4 +1,4 @@
-export type UserRole = "user" | "admin";
+export type UserRole = "jeweller" | "admin";
 
 export interface AuthUser {
   id: string;
@@ -6,18 +6,28 @@ export interface AuthUser {
   email: string;
   role: UserRole;
   isEmailVerified: boolean;
-  isActive: boolean;
+  isActive?: boolean;
   profilePhotoUrl?: string | null;
   createdAt?: string;
   updatedAt?: string;
 }
 
-export interface AuthResponse {
+export interface RegisterResponse {
   success: boolean;
   message: string;
   data: {
     user: AuthUser;
+    message: string;
+  };
+}
+
+export interface LoginResponse {
+  success: boolean;
+  message: string;
+  data: {
     accessToken: string;
+    refreshToken: string;
+    user: AuthUser;
   };
 }
 
@@ -26,6 +36,22 @@ export interface MeResponse {
   message: string;
   data: {
     user: AuthUser;
+  };
+}
+
+export interface VerifyEmailResponse {
+  success: boolean;
+  message: string;
+  data: {
+    user: AuthUser;
+  };
+}
+
+export interface BasicSuccessResponse {
+  success: boolean;
+  message: string;
+  data?: {
+    message?: string;
   };
 }
 
@@ -50,8 +76,9 @@ export interface ForgotPasswordInput {
 }
 
 export interface ResetPasswordInput {
-  token: string;
-  password: string;
+  email: string;
+  otp: string;
+  newPassword: string;
 }
 
 export interface ChangePasswordInput {

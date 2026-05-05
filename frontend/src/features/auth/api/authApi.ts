@@ -1,27 +1,31 @@
 import { httpClient } from "../../../shared/api/httpClient";
-
 import type {
-  AuthResponse,
+  BasicSuccessResponse,
   ChangePasswordInput,
   ForgotPasswordInput,
   LoginInput,
+  LoginResponse,
   MeResponse,
   RegisterInput,
+  RegisterResponse,
   ResetPasswordInput,
   VerifyEmailInput,
+  VerifyEmailResponse,
 } from "../types/authTypes";
 
 export const authApi = {
   register(input: RegisterInput) {
-    return httpClient.post<AuthResponse>("/auth/register", input);
+    return httpClient.post<RegisterResponse>("/auth/register", input);
   },
 
   login(input: LoginInput) {
-    return httpClient.post<AuthResponse>("/auth/login", input);
+    return httpClient.post<LoginResponse>("/auth/login", input);
   },
 
-  logout() {
-    return httpClient.post("/auth/logout");
+  logout(refreshToken: string) {
+    return httpClient.post<BasicSuccessResponse>("/auth/logout", {
+      refreshToken,
+    });
   },
 
   getMe() {
@@ -29,25 +33,31 @@ export const authApi = {
   },
 
   verifyEmail(input: VerifyEmailInput) {
-    return httpClient.post("/auth/verify-email", input);
+    return httpClient.post<VerifyEmailResponse>("/auth/verify-email", input);
   },
 
   resendEmailVerification(email: string) {
-    return httpClient.post("/auth/resend-email-verification", {
-      email,
-    });
+    return httpClient.post<BasicSuccessResponse>(
+      "/auth/resend-email-verification",
+      {
+        email,
+      }
+    );
   },
 
   forgotPassword(input: ForgotPasswordInput) {
-    return httpClient.post("/auth/forgot-password", input);
+    return httpClient.post<BasicSuccessResponse>("/auth/forgot-password", input);
   },
 
   resetPassword(input: ResetPasswordInput) {
-    return httpClient.post("/auth/reset-password", input);
+    return httpClient.post<BasicSuccessResponse>("/auth/reset-password", input);
   },
 
   changePassword(input: ChangePasswordInput) {
-    return httpClient.post("/auth/change-password", input);
+    return httpClient.post<BasicSuccessResponse>(
+      "/auth/change-password",
+      input
+    );
   },
 
   googleLoginUrl() {

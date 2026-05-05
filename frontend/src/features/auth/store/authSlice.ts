@@ -1,12 +1,12 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 import { authApi } from "../api/authApi";
-import { tokenStorage } from "../../../shared/utils/tokenStorage";
-
 import type { AuthUser, LoginInput, RegisterInput } from "../types/authTypes";
+import { tokenStorage } from "../../../shared/utils/tokenStorage";
 
 interface AuthState {
   user: AuthUser | null;
+  registeredEmail: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
@@ -14,6 +14,7 @@ interface AuthState {
 
 const initialState: AuthState = {
   user: null,
+  registeredEmail: null,
   isAuthenticated: false,
   isLoading: false,
   error: null,
@@ -38,24 +39,6 @@ function getErrorMessage(error: unknown): string {
   return "Something went wrong";
 }
 
-export const loginUser = createAsyncThunk<
-  AuthUser,
-  LoginInput,
-  { rejectValue: string }
->("auth/loginUser", async (input, thunkApi) => {
-  try {
-    const response = await authApi.login(input);
-
-    const { user, accessToken } = response.data.data;
-
-    tokenStorage.setAccessToken(accessToken);
-
-    return user;
-  } catch (error) {
-    return thunkApi.rejectWithValue(getErrorMessage(error));
-  }
-});
-
 export const registerUser = createAsyncThunk<
   AuthUser,
   RegisterInput,
@@ -64,9 +47,24 @@ export const registerUser = createAsyncThunk<
   try {
     const response = await authApi.register(input);
 
-    const { user, accessToken } = response.data.data;
+    return response.data.data.user;
+  } catch (error) {
+    return thunkApi.rejectWithValue(getErrorMessage(error));
+  }
+});
+
+export const loginUser = createAsyncThunk<
+  AuthUser,
+  LoginInput,
+  { rejectValue: string }
+>("auth/loginUser", async (input, thunkApi) => {
+  try {
+    const response = await authApi.login(input);
+
+    const { user, accessToken, refreshToken } = response.data.data;
 
     tokenStorage.setAccessToken(accessToken);
+    tokenStorage.setRefreshToken(refreshToken);
 
     return user;
   } catch (error) {
@@ -84,7 +82,7 @@ export const loadCurrentUser = createAsyncThunk<
 
     return response.data.data.user;
   } catch (error) {
-    tokenStorage.clearAccessToken();
+    tokenStorage.clearTokens();
 
     return thunkApi.rejectWithValue(getErrorMessage(error));
   }
@@ -94,11 +92,15 @@ export const logoutUser = createAsyncThunk<void, void, { rejectValue: string }>(
   "auth/logoutUser",
   async (_, thunkApi) => {
     try {
-      await authApi.logout();
+      const refreshToken = tokenStorage.getRefreshToken();
 
-      tokenStorage.clearAccessToken();
+      if (refreshToken) {
+        await authApi.logout(refreshToken);
+      }
+
+      tokenStorage.clearTokens();
     } catch (error) {
-      tokenStorage.clearAccessToken();
+      tokenStorage.clearTokens();
 
       return thunkApi.rejectWithValue(getErrorMessage(error));
     }
@@ -114,9 +116,10 @@ const authSlice = createSlice({
     },
 
     forceLogout(state) {
-      tokenStorage.clearAccessToken();
+      tokenStorage.clearTokens();
 
       state.user = null;
+      state.registeredEmail = null;
       state.isAuthenticated = false;
       state.isLoading = false;
       state.error = null;
@@ -124,6 +127,26 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+
+      // Register
+      .addCase(registerUser.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(registerUser.fulfilled, (state, action) => {
+        state.user = null;
+        state.registeredEmail = action.payload.email;
+        state.isAuthenticated = false;
+        state.isLoading = false;
+        state.error = null;
+      })
+      .addCase(registerUser.rejected, (state, action) => {
+        state.user = null;
+        state.registeredEmail = null;
+        state.isAuthenticated = false;
+        state.isLoading = false;
+        state.error = action.payload || "Register failed";
+      })
 
       // Login
       .addCase(loginUser.pending, (state) => {
@@ -141,24 +164,6 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
         state.isLoading = false;
         state.error = action.payload || "Login failed";
-      })
-
-      // Register
-      .addCase(registerUser.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
-      .addCase(registerUser.fulfilled, (state, action) => {
-        state.user = action.payload;
-        state.isAuthenticated = true;
-        state.isLoading = false;
-        state.error = null;
-      })
-      .addCase(registerUser.rejected, (state, action) => {
-        state.user = null;
-        state.isAuthenticated = false;
-        state.isLoading = false;
-        state.error = action.payload || "Register failed";
       })
 
       // Load current user
@@ -184,12 +189,14 @@ const authSlice = createSlice({
       })
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
+        state.registeredEmail = null;
         state.isAuthenticated = false;
         state.isLoading = false;
         state.error = null;
       })
       .addCase(logoutUser.rejected, (state, action) => {
         state.user = null;
+        state.registeredEmail = null;
         state.isAuthenticated = false;
         state.isLoading = false;
         state.error = action.payload || null;
