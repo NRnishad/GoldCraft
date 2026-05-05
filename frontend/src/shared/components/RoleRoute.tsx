@@ -19,7 +19,15 @@ export function RoleRoute({ allowedRoles }: RoleRouteProps) {
   }
 
   if (!isAuthenticated || !user) {
-    return <Navigate to="/login" replace state={{ from: location }} />;
+    const isAdminRoute = location.pathname.startsWith("/admin");
+
+    return (
+      <Navigate
+        to={isAdminRoute ? "/admin/login" : "/login"}
+        replace
+        state={{ from: location }}
+      />
+    );
   }
 
   if (!allowedRoles.includes(user.role)) {

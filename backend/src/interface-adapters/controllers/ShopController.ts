@@ -1,13 +1,17 @@
 import { Response } from "express";
 import { AuthRequest } from "../middlewares/authMiddleware";
 import {
+  makeCreateProfilePhotoUploadUrlUseCase,
   makeGetOnboardingStateUseCase,
   makeGetShopProfileUseCase,
   makeSaveOnboardingUseCase,
+  makeUpdateShopProfilePhotoUseCase,
   makeUpdateShopProfileUseCase,
 } from "../factories/ShopFactory";
 import {
   onboardingSchema,
+  profilePhotoUploadUrlSchema,
+  updateProfilePhotoSchema,
   updateShopProfileSchema,
 } from "../validators/shopValidators";
 import { sendSuccess } from "../utils/response";
@@ -115,4 +119,5 @@ export const ShopController = {
       throw error;
     }
   },
+  
 };

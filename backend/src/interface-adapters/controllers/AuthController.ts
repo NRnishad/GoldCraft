@@ -166,21 +166,9 @@ export const AuthController = {
 
   const useCase = makeForgotPasswordUseCase();
 
-  try {
-    const result = await useCase.execute(input);
+  const result = await useCase.execute(input);
 
-    return sendSuccess(res, "Password reset OTP sent successfully", result);
-  } catch (error) {
-    if (error instanceof Error && error.message === "USER_NOT_FOUND") {
-      throw new AppError("User not found", 404, "USER_NOT_FOUND");
-    }
-
-    if (error instanceof Error && error.message === "USER_INACTIVE") {
-      throw new AppError("User account is inactive", 403, "USER_INACTIVE");
-    }
-
-    throw error;
-  }
+  return sendSuccess(res, "Check your inbox", result);
 },
 
 async resetPassword(req: Request, res: Response) {
@@ -248,95 +236,6 @@ async refreshToken(req: Request, res: Response) {
 
     if (error instanceof Error && error.message === "USER_NOT_FOUND") {
       throw new AppError("User not found", 404, "USER_NOT_FOUND");
-    }
-
-    if (error instanceof Error && error.message === "USER_INACTIVE") {
-      throw new AppError("User account is inactive", 403, "USER_INACTIVE");
-    }
-
-    throw error;
-  }
-},async changePassword(req: AuthRequest, res: Response) {
-  if (!req.user) {
-    throw new AppError("Unauthorized", 401, "UNAUTHORIZED");
-  }
-
-  const input = changePasswordSchema.parse(req.body);
-
-  const useCase = makeChangePasswordUseCase();
-
-  try {
-    const result = await useCase.execute({
-      userId: req.user.userId,
-      currentPassword: input.currentPassword,
-      newPassword: input.newPassword,
-    });
-
-    return sendSuccess(res, "Password changed successfully", result);
-  } catch (error) {
-    if (error instanceof Error && error.message === "USER_NOT_FOUND") {
-      throw new AppError("User not found", 404, "USER_NOT_FOUND");
-    }
-
-    if (error instanceof Error && error.message === "USER_INACTIVE") {
-      throw new AppError("User account is inactive", 403, "USER_INACTIVE");
-    }
-
-    if (
-      error instanceof Error &&
-      error.message === "PASSWORD_LOGIN_NOT_AVAILABLE"
-    ) {
-      throw new AppError(
-        "This account uses Google login. Password change is not available.",
-        400,
-        "PASSWORD_LOGIN_NOT_AVAILABLE",
-      );
-    }
-
-    if (
-      error instanceof Error &&
-      error.message === "INVALID_CURRENT_PASSWORD"
-    ) {
-      throw new AppError(
-        "Current password is incorrect",
-        400,
-        "INVALID_CURRENT_PASSWORD",
-      );
-    }
-
-    throw error;
-  }
-},
-
-async getGoogleLoginUrl(_req: Request, res: Response) {
-  const useCase = makeGoogleLoginUseCase();
-
-  const result = useCase.getLoginUrl();
-
-  return sendSuccess(res, "Google login URL generated", result);
-},
-
-async googleCallback(req: Request, res: Response) {
-  const query = googleCallbackSchema.parse(req.query);
-
-  const useCase = makeGoogleLoginUseCase();
-
-  try {
-    const result = await useCase.completeLogin({
-      code: query.code,
-    });
-
-    return sendSuccess(res, "Google login successful", result);
-  } catch (error) {
-    if (
-      error instanceof Error &&
-      error.message === "GOOGLE_EMAIL_NOT_VERIFIED"
-    ) {
-      throw new AppError(
-        "Google email is not verified",
-        400,
-        "GOOGLE_EMAIL_NOT_VERIFIED",
-      );
     }
 
     if (error instanceof Error && error.message === "USER_INACTIVE") {

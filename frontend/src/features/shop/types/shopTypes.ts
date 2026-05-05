@@ -63,3 +63,4 @@ export interface UpdateShopProfileResponse {
     shop: Shop;
   };
 }
+

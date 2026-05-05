@@ -110,7 +110,7 @@ export function ForgotPasswordPage() {
               <span>GoldCraft</span>
             </Link>
 
-            <p className="login-card__eyebrow">Password reset</p>
+           
 
             <h2>Forgot your password?</h2>
 

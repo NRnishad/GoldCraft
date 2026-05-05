@@ -23,12 +23,7 @@ const features = [
     description:
       "Keep your jewellery shop information ready for posters, public display, and future customer-facing pages.",
   },
-  {
-    icon: "04",
-    title: "Admin control",
-    description:
-      "Manage users, roles, account access, and platform safety from a clean admin dashboard.",
-  },
+ 
 ];
 
 const steps = [
@@ -81,9 +76,7 @@ export function HomePage() {
             </div>
 
             <div className="public-hero__meta">
-              <span>OTP-secured accounts</span>
-              <span>Jewellery shop dashboard</span>
-              <span>Daily poster workflow</span>
+              
             </div>
           </div>
 
@@ -119,12 +112,12 @@ export function HomePage() {
 
       <section className="public-section public-section--white">
         <div className="public-page__frame">
-          <p className="public-eyebrow">Features</p>
+          
 
           <h2>Everything needed for jewellery shop marketing.</h2>
 
           <p className="public-section__intro">
-            Start with shop setup and user management now. Then build toward
+            Start with shop setup now. Then build toward
             gold rate posters, AI poster generation, and public customer pages.
           </p>
 

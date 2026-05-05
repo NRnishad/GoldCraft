@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 
 import { App } from "./App";
 import { LoginPage } from "../features/auth/pages/LoginPage";
+import { AdminLoginPage } from "../features/auth/pages/AdminLoginPage";
 import { RegisterPage } from "../features/auth/pages/RegisterPage";
 import { VerifyEmailPage } from "../features/auth/pages/VerifyEmailPage";
 import { ForgotPasswordPage } from "../features/auth/pages/ForgotPasswordPage";
@@ -33,21 +34,25 @@ export const router = createBrowserRouter([
     element: <App />,
     children: [
       {
-        path: "/",
-        element: <HomePage />,
-      },
-      {
-        path: "/pricing",
-        element: <PricingPage />,
-      },
-      {
-        path: "/login",
-        element: <LoginPage />,
-      },
-      {
-        path: "/register",
-        element: <RegisterPage />,
-      },
+  path: "/",
+  element: <HomePage />,
+},
+{
+  path: "/pricing",
+  element: <PricingPage />,
+},
+{
+  path: "/login",
+  element: <LoginPage />,
+},
+{
+  path: "/admin/login",
+  element: <AdminLoginPage />,
+},
+{
+  path: "/register",
+  element: <RegisterPage />,
+},
       {
         path: "/verify-email",
         element: <VerifyEmailPage />,

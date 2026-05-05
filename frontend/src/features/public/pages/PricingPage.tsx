@@ -45,8 +45,8 @@ const plans: Plan[] = [
     features: [
       "Everything in Plus",
       "Priority poster workflow",
-      "Future WhatsApp sharing support",
-      "Future Instagram sharing support",
+      "WhatsApp sharing support",
+      "Instagram sharing support",
       "Priority support",
     ],
   },
@@ -146,10 +146,7 @@ export function PricingPage() {
         </div>
       </section>
 
-      <section className="pricing-note">
-        <strong>Note:</strong> This pricing page is public. Payment handling can
-        be added later when your subscription backend is ready.
-      </section>
+      
     </main>
   );
 }

@@ -1,4 +1,4 @@
-import { Shop } from "../../../entities/Shop";
+import { Shop } from "@entities/Shop";
 
 export interface IUpdateShopProfilePhotoRepository {
   updateProfilePhoto(input: {

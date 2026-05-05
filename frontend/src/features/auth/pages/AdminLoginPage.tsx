@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { useAppDispatch, useAppSelector } from "../../../app/hooks";
 import { clearAuthError, forceLogout, loginUser } from "../store/authSlice";
@@ -8,30 +8,16 @@ import type { LoginInput } from "../types/authTypes";
 
 import "./LoginPage.css";
 
-export function LoginPage() {
+export function AdminLoginPage() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const [searchParams] = useSearchParams();
 
   const { user, isAuthenticated, isLoading, error } = useAppSelector(
     (state) => state.auth
   );
 
-  const verifiedMessage = useMemo(() => {
-    const verified = searchParams.get("verified");
-    const email = searchParams.get("email");
-
-    if (verified === "true") {
-      return email
-        ? `Email verified successfully for ${email}. You can now sign in.`
-        : "Email verified successfully. You can now sign in.";
-    }
-
-    return null;
-  }, [searchParams]);
-
   const [formData, setFormData] = useState<LoginInput>({
-    email: searchParams.get("email") || "",
+    email: "",
     password: "",
   });
 
@@ -43,8 +29,8 @@ export function LoginPage() {
       return;
     }
 
-    if (user.role === "jeweller") {
-      navigate("/shop/onboarding", { replace: true });
+    if (user.role === "admin") {
+      navigate("/admin/users", { replace: true });
     }
   }, [isAuthenticated, user, navigate]);
 
@@ -66,13 +52,13 @@ export function LoginPage() {
     try {
       const loggedInUser = await dispatch(loginUser(formData)).unwrap();
 
-      if (loggedInUser.role !== "jeweller") {
+      if (loggedInUser.role !== "admin") {
         dispatch(forceLogout());
-        setLocalError("This login page is only for jeweller accounts. Please use admin login.");
+        setLocalError("This login page is only for admin accounts. Please use jeweller login.");
         return;
       }
 
-      navigate("/shop/onboarding", { replace: true });
+      navigate("/admin/users", { replace: true });
     } catch {
       /**
        * Redux already stores backend error.
@@ -86,65 +72,62 @@ export function LoginPage() {
 
   return (
     <main className="login-page">
-      <section className="login-page__aside" aria-label="GoldCraft overview">
+      <section className="login-page__aside" aria-label="GoldCraft admin overview">
         <Link to="/" className="login-brand" aria-label="GoldCraft home">
           <span className="login-brand__mark">G</span>
 
           <span className="login-brand__text">
             <strong>GoldCraft</strong>
-            <small>AI gold poster studio</small>
+            <small>Admin console</small>
           </span>
         </Link>
 
         <div className="login-page__aside-content">
-          <p className="login-page__eyebrow">Jeweller workspace</p>
+          <p className="login-page__eyebrow">Admin access</p>
 
-          <h1>Sign in to create daily gold rate posters.</h1>
+          <h1>Manage users and protect the platform.</h1>
 
           <p>
-            Access your jewellery shop dashboard, manage shop details, and
-            prepare daily gold rate poster content from GoldCraft.
+            Admin login is only for GoldCraft platform administrators who manage
+            users, roles, account status, and platform access.
           </p>
         </div>
 
         <div className="login-page__feature-list">
           <div className="login-page__feature-card">
             <span>01</span>
-            <p>Manage your jewellery shop profile</p>
+            <p>Review GoldCraft users</p>
           </div>
 
           <div className="login-page__feature-card">
             <span>02</span>
-            <p>Prepare daily gold rate update content</p>
+            <p>Block or unblock user accounts</p>
           </div>
 
           <div className="login-page__feature-card">
             <span>03</span>
-            <p>Use GoldCraft poster generation tools</p>
+            <p>Manage user roles safely</p>
           </div>
         </div>
       </section>
 
-      <section className="login-page__form-section" aria-label="Jeweller login form">
+      <section className="login-page__form-section" aria-label="Admin login form">
         <div className="login-card">
           <div className="login-card__header">
             <Link to="/" className="login-card__mobile-brand">
               <span className="login-brand__mark">G</span>
-              <span>GoldCraft</span>
+              <span>GoldCraft Admin</span>
             </Link>
 
-            
+            <p className="login-card__eyebrow">Admin login</p>
 
-            <h2>Sign in to your shop</h2>
+            <h2>Sign in as admin</h2>
 
-           
+            <p>
+              This page is only for admin accounts. Jewellers should use the
+              normal login page.
+            </p>
           </div>
-
-          {verifiedMessage && (
-            <div className="login-card__success" role="status">
-              {verifiedMessage}
-            </div>
-          )}
 
           {(error || localError) && (
             <div className="login-card__error" role="alert">
@@ -153,32 +136,32 @@ export function LoginPage() {
           )}
 
           <form className="login-form" onSubmit={handleSubmit}>
-            <label className="login-form__field" htmlFor="email">
+            <label className="login-form__field" htmlFor="admin-email">
               <span>Email address</span>
 
               <input
-                id="email"
+                id="admin-email"
                 name="email"
                 type="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                placeholder="you@example.com"
+                placeholder="admin@example.com"
                 autoComplete="email"
                 required
               />
             </label>
 
-            <label className="login-form__field" htmlFor="password">
+            <label className="login-form__field" htmlFor="admin-password">
               <span>Password</span>
 
               <div className="login-form__password-input">
                 <input
-                  id="password"
+                  id="admin-password"
                   name="password"
                   type={showPassword ? "text" : "password"}
                   value={formData.password}
                   onChange={handleInputChange}
-                  placeholder="Enter your password"
+                  placeholder="Enter admin password"
                   autoComplete="current-password"
                   required
                 />
@@ -203,16 +186,12 @@ export function LoginPage() {
               className="login-form__submit"
               disabled={isLoading}
             >
-              {isLoading ? "Signing in..." : "Sign in"}
+              {isLoading ? "Signing in..." : "Sign in as admin"}
             </button>
           </form>
 
           <p className="login-card__footer-text">
-            New to GoldCraft? <Link to="/register">Create an account</Link>
-          </p>
-
-          <p className="login-card__footer-text">
-            Are you an admin? <Link to="/admin/login">Admin login</Link>
+            Not an admin? <Link to="/login">Jeweller login</Link>
           </p>
         </div>
       </section>
