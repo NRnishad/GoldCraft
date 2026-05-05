@@ -12,7 +12,6 @@ import {
 from "@use-cases/shop/UpdateShopProfileUseCase/IShopRepository";
 import { IShopDocument, ShopModel } from "../models/ShopModel";
 import { IUpdateShopProfilePhotoRepository } from "@use-cases/shop/UpdateShopProfilePhotoUseCase/IShopRepository";
-
 export class MongoShopRepository
   implements
     IGetOnboardingStateShopRepository,
