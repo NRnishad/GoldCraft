@@ -1,17 +1,16 @@
 import { Response } from "express";
 import { AuthRequest } from "../middlewares/authMiddleware";
 import {
-  makeCreateProfilePhotoUploadUrlUseCase,
   makeGetOnboardingStateUseCase,
   makeGetShopProfileUseCase,
   makeSaveOnboardingUseCase,
-  makeUpdateShopProfilePhotoUseCase,
-  makeUpdateShopProfileUseCase,
+ makeCreateProfilePhotoUploadUrlUseCase,
+makeUpdateShopProfilePhotoUseCase,
 } from "../factories/ShopFactory";
 import {
   onboardingSchema,
   profilePhotoUploadUrlSchema,
-  updateProfilePhotoSchema,
+updateProfilePhotoSchema,
   updateShopProfileSchema,
 } from "../validators/shopValidators";
 import { sendSuccess } from "../utils/response";
@@ -119,5 +118,72 @@ export const ShopController = {
       throw error;
     }
   },
+  async createProfilePhotoUploadUrl(req: AuthRequest, res: Response) {
+  const ownerUserId = ensureJeweller(req);
+  const input = profilePhotoUploadUrlSchema.parse(req.body);
+  const useCase = makeCreateProfilePhotoUploadUrlUseCase();
+
+  try {
+    const result = await useCase.execute({
+      ownerUserId,
+      ...input,
+    });
+
+    return sendSuccess(res, "Profile photo upload URL created", result);
+  } catch (error) {
+    if (error instanceof Error && error.message === "UNSUPPORTED_FILE_TYPE") {
+      throw new AppError(
+        "Only JPG, PNG, and WebP images are allowed",
+        400,
+        "UNSUPPORTED_FILE_TYPE",
+      );
+    }
+
+    if (error instanceof Error && error.message === "FILE_NAME_REQUIRED") {
+      throw new AppError("File name is required", 400, "FILE_NAME_REQUIRED");
+    }
+
+    mapShopNotFound(error);
+  }
+},
+
+async updateProfilePhoto(req: AuthRequest, res: Response) {
+  const ownerUserId = ensureJeweller(req);
+  const input = updateProfilePhotoSchema.parse(req.body);
+  const useCase = makeUpdateShopProfilePhotoUseCase();
+
+  try {
+    const result = await useCase.execute({
+      ownerUserId,
+      ...input,
+    });
+
+    return sendSuccess(res, "Profile photo updated", result);
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message === "INVALID_PROFILE_PHOTO_KEY"
+    ) {
+      throw new AppError(
+        "Invalid profile photo key",
+        400,
+        "INVALID_PROFILE_PHOTO_KEY",
+      );
+    }
+
+    if (
+      error instanceof Error &&
+      error.message === "INVALID_PROFILE_PHOTO_URL"
+    ) {
+      throw new AppError(
+        "Invalid profile photo URL",
+        400,
+        "INVALID_PROFILE_PHOTO_URL",
+      );
+    }
+
+    mapShopNotFound(error);
+  }
+},
   
 };

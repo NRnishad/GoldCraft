@@ -19,6 +19,25 @@ export const updateShopProfileSchema = z
   .refine((data) => Object.keys(data).length > 0, {
     message: "At least one profile field is required",
   });
+  export const profilePhotoUploadUrlSchema = z.object({
+  fileName: z.string().trim().min(1, "File name is required"),
+  contentType: z.enum(["image/jpeg", "image/png", "image/webp"], {
+    errorMap: () => ({
+      message: "Only JPG, PNG, and WebP images are allowed",
+    }),
+  }),
+});
+
+export const updateProfilePhotoSchema = z.object({
+  profilePhotoKey: z.string().trim().min(1, "Profile photo key is required"),
+  profilePhotoUrl: z.string().trim().url("Profile photo URL must be valid"),
+});
+
+export type ProfilePhotoUploadUrlInput = z.infer<
+  typeof profilePhotoUploadUrlSchema
+>;
+
+export type UpdateProfilePhotoInput = z.infer<typeof updateProfilePhotoSchema>;
 
 export type OnboardingInput = z.infer<typeof onboardingSchema>;
 export type UpdateShopProfileInput = z.infer<typeof updateShopProfileSchema>;

@@ -28,5 +28,15 @@ router.put(
   authMiddleware,
   asyncHandler(ShopController.updateProfile),
 );
+router.post(
+  "/profile/photo/upload-url",
+  authMiddleware,
+  asyncHandler(ShopController.createProfilePhotoUploadUrl),
+);
 
+router.put(
+  "/profile/photo",
+  authMiddleware,
+  asyncHandler(ShopController.updateProfilePhoto),
+);
 export default router;

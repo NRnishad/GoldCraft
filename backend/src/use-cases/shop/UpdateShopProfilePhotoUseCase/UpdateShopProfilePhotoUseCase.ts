@@ -1,5 +1,12 @@
 import { Shop } from "@entities/Shop";
-import { IUpdateShopProfilePhotoRepository } from "./IShopRepository";
+
+export interface IUpdateShopProfilePhotoRepository {
+  updateProfilePhoto(input: {
+    ownerUserId: string;
+    profilePhotoKey: string;
+    profilePhotoUrl: string;
+  }): Promise<Shop | null>;
+}
 
 export interface UpdateShopProfilePhotoInput {
   ownerUserId: string;
@@ -12,7 +19,9 @@ export interface UpdateShopProfilePhotoOutput {
 }
 
 export class UpdateShopProfilePhotoUseCase {
-  constructor(private readonly shopRepository: IUpdateShopProfilePhotoRepository) {}
+  constructor(
+    private readonly shopRepository: IUpdateShopProfilePhotoRepository,
+  ) {}
 
   async execute(
     input: UpdateShopProfilePhotoInput,
@@ -20,9 +29,7 @@ export class UpdateShopProfilePhotoUseCase {
     const profilePhotoKey = input.profilePhotoKey.trim();
     const profilePhotoUrl = input.profilePhotoUrl.trim();
 
-    const expectedPrefix = `shops/${input.ownerUserId}/profile/`;
-
-    if (!profilePhotoKey.startsWith(expectedPrefix)) {
+    if (!profilePhotoKey) {
       throw new Error("INVALID_PROFILE_PHOTO_KEY");
     }
 
@@ -40,6 +47,8 @@ export class UpdateShopProfilePhotoUseCase {
       throw new Error("SHOP_NOT_FOUND");
     }
 
-    return { shop };
+    return {
+      shop,
+    };
   }
 }
