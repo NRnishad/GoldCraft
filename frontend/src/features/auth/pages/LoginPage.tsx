@@ -211,9 +211,7 @@ export function LoginPage() {
             New to GoldCraft? <Link to="/register">Create an account</Link>
           </p>
 
-          <p className="login-card__footer-text">
-            Are you an admin? <Link to="/admin/login">Admin login</Link>
-          </p>
+          
         </div>
       </section>
     </main>

@@ -134,14 +134,11 @@ export function AdminUsersPage() {
     <section className="admin-page">
       <div className="admin-page__header">
         <div>
-          <p className="admin-page__eyebrow">Admin users</p>
+          <p className="admin-page__eyebrow"></p>
 
           <h1>Manage GoldCraft users</h1>
 
-          <p>
-            Search users, review account status, open user details, block or
-            unblock accounts, and change roles when needed.
-          </p>
+         
         </div>
       </div>
 

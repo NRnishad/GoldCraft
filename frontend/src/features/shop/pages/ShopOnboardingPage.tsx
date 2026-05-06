@@ -131,7 +131,7 @@ export function ShopOnboardingPage() {
   return (
     <section className="shop-page">
       <div className="shop-page__header">
-        <p className="shop-page__eyebrow">Shop onboarding</p>
+        
 
         <h1>Set up your jewellery shop</h1>
 
@@ -166,7 +166,7 @@ export function ShopOnboardingPage() {
                   type="text"
                   value={formData.shopName}
                   onChange={handleInputChange}
-                  placeholder="Example: Nishad Gold Palace"
+                  placeholder="type here.."
                   autoComplete="organization"
                   required
                 />
@@ -182,7 +182,7 @@ export function ShopOnboardingPage() {
                     type="tel"
                     value={formData.phone}
                     onChange={handleInputChange}
-                    placeholder="Example: 9876543210"
+                    placeholder="number"
                     autoComplete="tel"
                     required
                   />
@@ -197,7 +197,7 @@ export function ShopOnboardingPage() {
                     type="text"
                     value={formData.city}
                     onChange={handleInputChange}
-                    placeholder="Example: Thrissur"
+                    placeholder="type here.."
                     autoComplete="address-level2"
                     required
                   />
@@ -227,7 +227,7 @@ export function ShopOnboardingPage() {
                   type="text"
                   value={formData.tagline || ""}
                   onChange={handleInputChange}
-                  placeholder="Example: Trusted jewellery since 1998"
+                  placeholder="type here.."
                   maxLength={150}
                 />
 

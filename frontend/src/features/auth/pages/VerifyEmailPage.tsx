@@ -23,10 +23,6 @@ export function VerifyEmailPage() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  function handleEmailChange(event: ChangeEvent<HTMLInputElement>) {
-    setEmail(event.target.value);
-    clearMessages();
-  }
 
   function handleOtpChange(event: ChangeEvent<HTMLInputElement>) {
     const onlyNumbers = event.target.value.replace(/\D/g, "");
@@ -178,20 +174,7 @@ export function VerifyEmailPage() {
           )}
 
           <form className="login-form" onSubmit={handleVerifyEmail}>
-            <label className="login-form__field" htmlFor="email">
-              <span>Email address</span>
-
-              <input
-                id="email"
-                name="email"
-                type="email"
-                value={email}
-                onChange={handleEmailChange}
-                placeholder="you@example.com"
-                autoComplete="email"
-                required
-              />
-            </label>
+           
 
             <label className="login-form__field" htmlFor="otp">
               <span>Verification OTP</span>

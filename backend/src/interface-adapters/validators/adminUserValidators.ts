@@ -44,4 +44,4 @@ export const updateUserRoleSchema = z.object({
   role: z.enum(["jeweller", "admin"], {
     required_error: "Role is required",
   }),
-});
+});      

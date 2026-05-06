@@ -87,27 +87,11 @@ export function AdminLoginPage() {
 
           <h1>Manage users and protect the platform.</h1>
 
-          <p>
-            Admin login is only for GoldCraft platform administrators who manage
-            users, roles, account status, and platform access.
-          </p>
+        
         </div>
 
         <div className="login-page__feature-list">
-          <div className="login-page__feature-card">
-            <span>01</span>
-            <p>Review GoldCraft users</p>
-          </div>
-
-          <div className="login-page__feature-card">
-            <span>02</span>
-            <p>Block or unblock user accounts</p>
-          </div>
-
-          <div className="login-page__feature-card">
-            <span>03</span>
-            <p>Manage user roles safely</p>
-          </div>
+          
         </div>
       </section>
 
@@ -119,14 +103,11 @@ export function AdminLoginPage() {
               <span>GoldCraft Admin</span>
             </Link>
 
-            <p className="login-card__eyebrow">Admin login</p>
+            
 
             <h2>Sign in as admin</h2>
 
-            <p>
-              This page is only for admin accounts. Jewellers should use the
-              normal login page.
-            </p>
+           
           </div>
 
           {(error || localError) && (
