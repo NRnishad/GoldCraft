@@ -13,6 +13,10 @@ router.post(
   "/resend-email-verification",
   asyncHandler(AuthController.resendEmailVerification),
 );
+
+router.get("/google", asyncHandler(AuthController.googleLogin));
+router.get("/google/callback", asyncHandler(AuthController.googleCallback));
+
 router.post("/forgot-password", asyncHandler(AuthController.forgotPassword));
 router.post("/reset-password", asyncHandler(AuthController.resetPassword));
 

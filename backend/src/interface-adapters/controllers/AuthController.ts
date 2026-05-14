@@ -24,6 +24,7 @@ googleCallbackSchema,
 import { sendSuccess } from "../utils/response";
 import { AppError } from "../utils/AppError";
 import { AuthRequest } from "../middlewares/authMiddleware";
+import { env } from "../../frameworks-and-drivers/config/env";
 
 export const AuthController = {
   async register(req: Request, res: Response) {
@@ -245,6 +246,34 @@ async refreshToken(req: Request, res: Response) {
     throw error;
   }
 },
+
+async googleLogin(req: Request, res: Response) {
+    const useCase = makeGoogleLoginUseCase();
+    const result = useCase.getLoginUrl();
+    res.redirect(result.url);
+  },
+
+  async googleCallback(req: Request, res: Response) {
+    const code = req.query.code as string;
+    
+    if (!code) {
+      return res.redirect(`${env.FRONTEND_URL}/login?error=Google login failed`);
+    }
+
+    try {
+      const useCase = makeGoogleLoginUseCase();
+      const result = await useCase.completeLogin({ code });
+      
+      const redirectUrl = new URL(`${env.FRONTEND_URL}/google-callback`);
+      redirectUrl.searchParams.set("accessToken", result.accessToken);
+      redirectUrl.searchParams.set("refreshToken", result.refreshToken);
+      redirectUrl.searchParams.set("user", JSON.stringify(result.user));
+      
+      res.redirect(redirectUrl.toString());
+    } catch (error) {
+      res.redirect(`${env.FRONTEND_URL}/login?error=Google authentication failed`);
+    }
+  },
 
 async logout(req: Request, res: Response) {
   const input = refreshTokenSchema.parse(req.body);

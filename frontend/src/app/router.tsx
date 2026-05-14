@@ -3,6 +3,7 @@ import { createBrowserRouter } from "react-router-dom";
 import { App } from "./App";
 import { LoginPage } from "../features/auth/pages/LoginPage";
 import { AdminLoginPage } from "../features/auth/pages/AdminLoginPage";
+import { GoogleCallbackPage } from "../features/auth/pages/GoogleCallbackPage";
 import { RegisterPage } from "../features/auth/pages/RegisterPage";
 import { VerifyEmailPage } from "../features/auth/pages/VerifyEmailPage";
 import { ForgotPasswordPage } from "../features/auth/pages/ForgotPasswordPage";
@@ -44,6 +45,10 @@ export const router = createBrowserRouter([
 {
   path: "/login",
   element: <LoginPage />,
+},
+{
+        path: "/google-callback",
+        element: <GoogleCallbackPage />,
 },
 {
   path: "/admin/login",
