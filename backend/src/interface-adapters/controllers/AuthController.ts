@@ -205,6 +205,56 @@ async resetPassword(req: Request, res: Response) {
     throw error;
   }
 },
+async changePassword(req: AuthRequest, res: Response) {
+    if (!req.user) {
+      throw new AppError("Unauthorized", 401, "UNAUTHORIZED");
+    }
+
+    const input = changePasswordSchema.parse(req.body);
+    const useCase = makeChangePasswordUseCase();
+
+    try {
+      const result = await useCase.execute({
+        userId: req.user.userId,
+        currentPassword: input.currentPassword,
+        newPassword: input.newPassword,
+      });
+
+      return sendSuccess(res, result.message, null);
+    } catch (error) {
+      if (error instanceof Error && error.message === "USER_NOT_FOUND") {
+        throw new AppError("User not found", 404, "USER_NOT_FOUND");
+      }
+
+      if (error instanceof Error && error.message === "USER_INACTIVE") {
+        throw new AppError("User account is inactive", 403, "USER_INACTIVE");
+      }
+
+      if (
+        error instanceof Error &&
+        error.message === "PASSWORD_LOGIN_NOT_AVAILABLE"
+      ) {
+        throw new AppError(
+          "Cannot change password for social login accounts",
+          400,
+          "PASSWORD_LOGIN_NOT_AVAILABLE"
+        );
+      }
+
+      if (
+        error instanceof Error &&
+        error.message === "INVALID_CURRENT_PASSWORD"
+      ) {
+        throw new AppError(
+          "Invalid current password",
+          400,
+          "INVALID_CURRENT_PASSWORD"
+        );
+      }
+
+      throw error;
+    }
+  },
 
 async refreshToken(req: Request, res: Response) {
   const input = refreshTokenSchema.parse(req.body);

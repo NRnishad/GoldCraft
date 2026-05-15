@@ -20,6 +20,8 @@ router.get("/google/callback", asyncHandler(AuthController.googleCallback));
 router.post("/forgot-password", asyncHandler(AuthController.forgotPassword));
 router.post("/reset-password", asyncHandler(AuthController.resetPassword));
 
+router.post("/change-password", authMiddleware, asyncHandler(AuthController.changePassword));
+
 router.post("/refresh-token", asyncHandler(AuthController.refreshToken));
 router.post("/logout", asyncHandler(AuthController.logout));
 
