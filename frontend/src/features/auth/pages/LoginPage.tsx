@@ -35,7 +35,11 @@ export function LoginPage() {
     password: "",
   });
 
-  const [localError, setLocalError] = useState<string | null>(null);
+  const [localError, setLocalError] = useState<string | null>(
+  searchParams.get("reason") === "blocked" 
+    ? "Your session was terminated because your account has been blocked by an administrator." 
+    : null
+);
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
