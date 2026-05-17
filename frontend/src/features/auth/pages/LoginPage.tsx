@@ -35,11 +35,19 @@ export function LoginPage() {
     password: "",
   });
 
-  const [localError, setLocalError] = useState<string | null>(
-  searchParams.get("reason") === "blocked" 
-    ? "Your session was terminated because your account has been blocked by an administrator." 
-    : null
-);
+  const [localError, setLocalError] = useState<string | null>(() => {
+    if (searchParams.get("reason") === "blocked") {
+      return "Your account has been blocked by an administrator.";
+    }
+    const urlError = searchParams.get("error");
+    if (urlError === "google_auth_failed") {
+      return "Google Authentication failed. Please try again.";
+    } else if (urlError) {
+      return decodeURIComponent(urlError);
+    }
+    
+    return null;
+  })
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {

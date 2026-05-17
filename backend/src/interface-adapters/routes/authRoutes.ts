@@ -27,4 +27,12 @@ router.post("/logout", asyncHandler(AuthController.logout));
 
 router.get("/me", authMiddleware, asyncHandler(AuthController.me));
 
+router.get("/sentry-test", (req, res, next) => {
+  try {
+    throw new Error("This is a critical Sentry test exception!");
+  } catch (error) {
+    next(error); 
+  }
+})
+
 export default router;

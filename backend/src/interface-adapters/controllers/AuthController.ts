@@ -25,7 +25,7 @@ import { sendSuccess } from "../utils/response";
 import { AppError } from "../utils/AppError";
 import { AuthRequest } from "../middlewares/authMiddleware";
 import { env } from "../../frameworks-and-drivers/config/env";
-
+import { appLogger } from "../../frameworks-and-drivers/logging/WinstonSentryLogger";
 export const AuthController = {
   async register(req: Request, res: Response) {
     const input = registerSchema.parse(req.body);
@@ -57,7 +57,7 @@ export const AuthController = {
 
     try {
       const result = await useCase.execute(input);
-
+appLogger.info("Login attempt initiated", { email: req.body.email })
       return sendSuccess(res, "Logged in successfully", result);
     } catch (error) {
       if (error instanceof Error && error.message === "INVALID_CREDENTIALS") {
@@ -320,8 +320,11 @@ async googleLogin(req: Request, res: Response) {
       redirectUrl.searchParams.set("user", JSON.stringify(result.user));
       
       res.redirect(redirectUrl.toString());
-    } catch (error) {
-      res.redirect(`${env.FRONTEND_URL}/login?error=Google authentication failed`);
+    } catch (error:any) {
+      if (error.message === "USER_INACTIVE") {
+        return res.redirect(`${env.FRONTEND_URL}/login?reason=blocked`);
+      }
+      return res.redirect(`${env.FRONTEND_URL}/login?error=google_auth_failed`);
     }
   },
 

@@ -4,6 +4,7 @@ import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import routes from "../../../interface-adapters/routes/index";
 import { errorHandler } from "@adapters/middlewares/errorHandler";
+import { appLogger } from "../../logging/WinstonSentryLogger";
 import { env } from "../../config/env";
 
 export function createApp() {
@@ -20,6 +21,15 @@ export function createApp() {
 
   app.use(express.json());
   app.use(cookieParser());
+
+  process.on("unhandledRejection", (reason: Error) => {
+  appLogger.error("CRITICAL: Unhandled Promise Rejection Intercepted", reason);
+});
+
+process.on("uncaughtException", (error: Error) => {
+  appLogger.error("CRITICAL: Uncaught Exception Exception Intercepted", error);
+  process.exit(1);
+});
 
   app.get("/health", (_req, res) => {
     res.json({

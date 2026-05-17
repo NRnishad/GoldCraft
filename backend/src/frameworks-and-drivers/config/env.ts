@@ -15,7 +15,8 @@ function requireEnv(name: string): string {
 export const env = {
   PORT: Number(process.env.PORT || 5000),
   MONGO_URI: requireEnv("MONGO_URI"),
-
+NODE_ENV: process.env.NODE_ENV || "development",
+  SENTRY_DSN: process.env.SENTRY_DSN || "",
   JWT_ACCESS_SECRET: requireEnv("JWT_ACCESS_SECRET"),
   JWT_ACCESS_EXPIRES_IN: process.env.JWT_ACCESS_EXPIRES_IN || "15m",
   JWT_REFRESH_SECRET: requireEnv("JWT_REFRESH_SECRET"),
