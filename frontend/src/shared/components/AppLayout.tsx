@@ -15,9 +15,9 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   {
-  label: "Dashboard",
-  to: "/dashboard",
-},
+    label: "Dashboard",
+    to: "/dashboard",
+  },
   {
     label: "Shop Onboarding",
     to: "/shop/onboarding",
@@ -29,8 +29,18 @@ const navItems: NavItem[] = [
     roles: ["jeweller"],
   },
   {
+    label: "Rates Dashboard",
+    to: "/shop/rates",
+    roles: ["jeweller"],
+  },
+  {
     label: "Admin Users",
     to: "/admin/users",
+    roles: ["admin"],
+  },
+  {
+    label: "Global Rates",
+    to: "/admin/rates",
     roles: ["admin"],
   },
   {
@@ -84,7 +94,7 @@ export function AppLayout() {
 
             <span>
               <strong>GoldCraft</strong>
-              <small>Dashboard</small>
+              
             </span>
           </Link>
 
@@ -157,8 +167,8 @@ export function AppLayout() {
           </button>
 
           <div>
-            <p className="app-shell__topbar-eyebrow">GoldCraft workspace</p>
-            <h1>Dashboard</h1>
+            <h1 className="app-shell__topbar-eyebrow">Workspace</h1>
+            
           </div>
 
           {user && (

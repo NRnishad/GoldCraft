@@ -16,17 +16,22 @@ export function errorHandler(
     ip: req.ip,
   };
 
-  if (error instanceof AppError) {
+if (error instanceof AppError) {
     appLogger.warn(`Operational Handled Exception [${error.statusCode}]: ${error.message}`, correlationData);
     
-    res.status(error.statusCode).json({
+    
+    let parsedStatus = Number(error.statusCode);
+    if (isNaN(parsedStatus) || parsedStatus < 100 || parsedStatus > 599) {
+      appLogger.error("Developer Error: AppError thrown with invalid status code format.", error);
+      parsedStatus = 500;
+    }
+
+    res.status(parsedStatus).json({
       success: false,
-      message: error.message,
+      message: typeof error.message === 'string' ? error.message : "An error occurred",
     });
     return;
   }
-
-  // Intercept unexpected/internal code failures and transmit telemetry to Sentry
   appLogger.error(`Unhandled unexpected exception triggered: ${error.message}`, error, correlationData);
 
   const responseMessage = env.NODE_ENV === "development" 

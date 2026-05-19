@@ -21,6 +21,10 @@ import { AppLayout } from "../shared/components/AppLayout";
 import { UnauthorizedPage } from "../shared/pages/UnauthorizedPage";
 import { NotFoundPage } from "../shared/pages/NotFoundPage";
 
+// --- NEW RATE PAGES ---
+import { AdminRatesPage } from "../features/admin/pages/AdminRatesPage";
+import { ShopRatesDashboard } from "../features/shop/pages/ShopRatesDashboard";
+
 function DashboardHomePage() {
   return (
     <div>
@@ -35,29 +39,29 @@ export const router = createBrowserRouter([
     element: <App />,
     children: [
       {
-  path: "/",
-  element: <HomePage />,
-},
-{
-  path: "/pricing",
-  element: <PricingPage />,
-},
-{
-  path: "/login",
-  element: <LoginPage />,
-},
-{
+        path: "/",
+        element: <HomePage />,
+      },
+      {
+        path: "/pricing",
+        element: <PricingPage />,
+      },
+      {
+        path: "/login",
+        element: <LoginPage />,
+      },
+      {
         path: "/google-callback",
         element: <GoogleCallbackPage />,
-},
-{
-  path: "/admin/login",
-  element: <AdminLoginPage />,
-},
-{
-  path: "/register",
-  element: <RegisterPage />,
-},
+      },
+      {
+        path: "/admin/login",
+        element: <AdminLoginPage />,
+      },
+      {
+        path: "/register",
+        element: <RegisterPage />,
+      },
       {
         path: "/verify-email",
         element: <VerifyEmailPage />,
@@ -108,6 +112,10 @@ export const router = createBrowserRouter([
                 path: "/shop/profile",
                 element: <ShopProfilePage />,
               },
+              {
+                path: "/shop/rates",
+                element: <ShopRatesDashboard />,
+              },
             ],
           },
         ],
@@ -126,6 +134,10 @@ export const router = createBrowserRouter([
               {
                 path: "/admin/users/:userId",
                 element: <AdminUserDetailsPage />,
+              },
+              {
+                path: "/admin/rates",
+                element: <AdminRatesPage />,
               },
             ],
           },

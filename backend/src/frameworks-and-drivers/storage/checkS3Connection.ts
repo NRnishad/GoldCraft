@@ -17,10 +17,6 @@ export async function checkS3Connection() {
         Bucket: env.AWS_S3_BUCKET_NAME,
       }),
     );
-
-    console.log(
-      "S3 connected"
-    );
   } catch (error) {
     console.error("S3 connection failed");
 
