@@ -6,6 +6,7 @@ import {
   makeSaveOnboardingUseCase,
  makeCreateProfilePhotoUploadUrlUseCase,
 makeUpdateShopProfilePhotoUseCase,
+makeUpdateShopProfileUseCase
 } from "../factories/ShopFactory";
 import {
   onboardingSchema,

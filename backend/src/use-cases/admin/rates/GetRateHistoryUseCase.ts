@@ -6,7 +6,7 @@ export class GetRateHistoryUseCase {
   constructor(private logger: ILogger) {}
 
   public async execute(daysLimit: number = 30): Promise<IGoldRate[]> {
-    this.logger.info(`Admin fetching rate history for the last ${daysLimit} days`);
+    
     
     const cutoffDate = new Date();
     cutoffDate.setUTCHours(0, 0, 0, 0);

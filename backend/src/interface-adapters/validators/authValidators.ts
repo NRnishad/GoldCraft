@@ -3,12 +3,12 @@ import { z } from "zod";
 export const registerSchema = z.object({
   name: z.string().min(2, "Name is required"),
   email: z.string().email("Valid email is required"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  password: z.string().min(8, "Password must be at least 8 characters").max(150, "password is too long"),
 });
 
 export const loginSchema = z.object({
   email: z.string().email("Valid email is required"),
-  password: z.string().min(1, "Password is required"),
+  password: z.string().min(1, "Password is required").max(150, "password is too long"),
 });
 
 export const verifyEmailSchema = z.object({
@@ -36,7 +36,7 @@ export const resetPasswordSchema = z.object({
     .max(6, "OTP must be 6 digits"),
   newPassword: z
     .string()
-    .min(8, "New password must be at least 8 characters"),
+    .min(8, "New password must be at least 8 characters").max(150, "password is too long"),
 });
 
 export const refreshTokenSchema = z.object({
@@ -47,7 +47,7 @@ export const changePasswordSchema = z.object({
   currentPassword: z.string().min(1, "Current password is required"),
   newPassword: z
     .string()
-    .min(8, "New password must be at least 8 characters"),
+    .min(8, "New password must be at least 8 characters").max(150, "password is too long"),
 });
 
 export const googleCallbackSchema = z.object({

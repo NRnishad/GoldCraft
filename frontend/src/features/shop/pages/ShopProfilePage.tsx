@@ -16,6 +16,8 @@ export function ShopProfilePage() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  // [NEW] State to track if the user is in edit mode
+  const [isEditing, setIsEditing] = useState(false); 
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
@@ -57,6 +59,13 @@ export function ShopProfilePage() {
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
+    // [NEW] If we are not editing, just turn edit mode on and stop.
+    if (!isEditing) {
+      setIsEditing(true);
+      return; 
+    }
+
+    // [EXISTING VALIDATION LOGIC]
     const cleanData: UpdateShopProfileInput = {
       shopName: formData.shopName?.trim(),
       phone: formData.phone?.trim(),
@@ -69,24 +78,16 @@ export function ShopProfilePage() {
       setErrorMessage("Shop name must be at least 2 characters.");
       return;
     }
-
-    if (!cleanData.phone || cleanData.phone.length < 8) {
-      setErrorMessage("Phone must be at least 8 characters.");
+    if (!cleanData.phone || !/^\d{10}$/.test(cleanData.phone)) {
+      setErrorMessage("Phone number must be exactly 10 digits.");
       return;
     }
-
     if (!cleanData.city || cleanData.city.length < 2) {
       setErrorMessage("City must be at least 2 characters.");
       return;
     }
-
     if (!cleanData.address || cleanData.address.length < 5) {
       setErrorMessage("Address must be at least 5 characters.");
-      return;
-    }
-
-    if (cleanData.tagline && cleanData.tagline.length > 150) {
-      setErrorMessage("Tagline must be 150 characters or less.");
       return;
     }
 
@@ -109,6 +110,7 @@ export function ShopProfilePage() {
       });
 
       setSuccessMessage("Shop profile updated successfully.");
+      setIsEditing(false); // [NEW] Lock the form again after successful save
     } catch (error) {
       setErrorMessage(getErrorMessage(error));
     } finally {
@@ -118,13 +120,15 @@ export function ShopProfilePage() {
 
   // --- IMAGE UPLOAD LOGIC ---
   function onFileChange(e: ChangeEvent<HTMLInputElement>) {
+    // [NEW] Don't allow photo changes if not in edit mode
+    if (!isEditing) return;
+
     if (e.target.files && e.target.files.length > 0) {
       const file = e.target.files[0];
       const reader = new FileReader();
       reader.addEventListener("load", () => setImageSrc(reader.result?.toString() || null));
       reader.readAsDataURL(file);
     }
-    // Reset input so the same file can be selected again if needed
     e.target.value = '';
   }
 
@@ -142,11 +146,9 @@ export function ShopProfilePage() {
       const croppedImageBlob = await getCroppedImg(imageSrc, croppedAreaPixels);
 
       const urlResponse = await shopApi.getProfilePhotoUploadUrl("profile.jpg", "image/jpeg");
-      const { uploadUrl, fileKey, publicUrl } = urlResponse.data.data; // Note: Ensure this matches backend output exactly
+      const { uploadUrl, fileKey, publicUrl } = urlResponse.data.data; 
 
       await shopApi.uploadToS3(uploadUrl, croppedImageBlob, "image/jpeg");
-
-      // Pass the explicit variables to the backend
       await shopApi.updateProfilePhoto(publicUrl, fileKey);
 
       setShop((prev) => prev ? { ...prev, profilePhotoUrl: publicUrl } : null);
@@ -172,15 +174,18 @@ export function ShopProfilePage() {
       {shop && (
         <div className="shop-profile-summary">
           <div className="shop-profile-summary__avatar" style={{ position: 'relative', overflow: 'hidden' }}>
-            <label htmlFor="photo-upload" style={{ cursor: 'pointer', display: 'block', width: '100%', height: '100%' }}>
+            {/* [NEW] Only show pointer cursor and Edit overlay if in edit mode */}
+            <label htmlFor="photo-upload" style={{ cursor: isEditing ? 'pointer' : 'default', display: 'block', width: '100%', height: '100%' }}>
               <img 
                  src={shop.profilePhotoUrl || "https://heerabhai.com/wp-content/uploads/2025/01/necklace.png"} 
                  alt="Shop Logo" 
                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
-              <div style={{ position: 'absolute', bottom: 0, width: '100%', background: 'rgba(0,0,0,0.5)', color: 'white', textAlign: 'center', fontSize: '12px', padding: '4px 0'}}>
-                Edit
-              </div>
+              {isEditing && (
+                <div style={{ position: 'absolute', bottom: 0, width: '100%', background: 'rgba(0,0,0,0.5)', color: 'white', textAlign: 'center', fontSize: '12px', padding: '4px 0'}}>
+                  Change
+                </div>
+              )}
             </label>
             <input 
               id="photo-upload" 
@@ -188,6 +193,7 @@ export function ShopProfilePage() {
               accept="image/*" 
               onChange={onFileChange} 
               style={{ display: 'none' }} 
+              disabled={!isEditing} // [NEW] Disable input if not editing
             />
           </div>
 
@@ -198,7 +204,7 @@ export function ShopProfilePage() {
         </div>
       )}
 
-      {/* CROPPER MODAL */}
+      {/* CROPPER MODAL (Unchanged) */}
       {imageSrc && (
         <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', zIndex: 9999, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ position: 'relative', width: '90%', maxWidth: '500px', height: '400px', background: '#333' }}>
@@ -221,7 +227,7 @@ export function ShopProfilePage() {
         </div>
       )}
 
-      {/* EXISTING PROFILE FORM */}
+      {/* PROFILE FORM */}
       <div className="shop-card">
         <form onSubmit={handleSubmit}>
           <div className="shop-card__body">
@@ -231,37 +237,61 @@ export function ShopProfilePage() {
             <div className="shop-form">
               <label className="shop-form__field" htmlFor="shopName">
                 <span>Shop name</span>
-                <input id="shopName" name="shopName" type="text" value={formData.shopName || ""} onChange={handleInputChange} required />
+                {/* [NEW] Added disabled prop tied to isEditing */}
+                <input id="shopName" name="shopName" type="text" value={formData.shopName || ""} onChange={handleInputChange} required disabled={!isEditing} />
               </label>
 
               <div className="shop-form__grid">
                 <label className="shop-form__field" htmlFor="phone">
                   <span>Phone number</span>
-                  <input id="phone" name="phone" type="tel" value={formData.phone || ""} onChange={handleInputChange} required />
+                  <input id="phone" name="phone" type="tel" value={formData.phone || ""} onChange={handleInputChange} required disabled={!isEditing} />
                 </label>
 
                 <label className="shop-form__field" htmlFor="city">
                   <span>City</span>
-                  <input id="city" name="city" type="text" value={formData.city || ""} onChange={handleInputChange} required />
+                  <input id="city" name="city" type="text" value={formData.city || ""} onChange={handleInputChange} required disabled={!isEditing} />
                 </label>
               </div>
 
               <label className="shop-form__field" htmlFor="address">
                 <span>Shop address</span>
-                <textarea id="address" name="address" value={formData.address || ""} onChange={handleInputChange} required />
+                <textarea id="address" name="address" value={formData.address || ""} onChange={handleInputChange} required disabled={!isEditing} />
               </label>
 
               <label className="shop-form__field" htmlFor="tagline">
                 <span>Tagline</span>
-                <input id="tagline" name="tagline" type="text" value={formData.tagline || ""} onChange={handleInputChange} maxLength={150} />
-                <p className="shop-form__help">Optional. Keep it short and suitable for posters.</p>
+                <input id="tagline" name="tagline" type="text" value={formData.tagline || ""} onChange={handleInputChange} maxLength={150} disabled={!isEditing} />
+                {isEditing && <p className="shop-form__help">Optional. Keep it short and suitable for posters.</p>}
               </label>
             </div>
           </div>
-          <div className="shop-card__footer">
-            <Link to="/shop/onboarding" className="shop-button shop-button--secondary">View onboarding</Link>
+          <div className="shop-card__footer" style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
+            {/* [NEW] Removed Onboarding Link. Added Cancel Edit Button */}
+            {isEditing && (
+               <button 
+                 type="button" 
+                 className="shop-button shop-button--secondary" 
+                 onClick={() => {
+                   setIsEditing(false);
+                   setErrorMessage(null);
+                   setSuccessMessage(null);
+                   // Reset form to last saved shop state
+                   if (shop) {
+                     setFormData({
+                       shopName: shop.shopName, phone: shop.phone,
+                       city: shop.city, address: shop.address,
+                       tagline: shop.tagline || "",
+                     });
+                   }
+                 }}
+               >
+                 Cancel
+               </button>
+            )}
+            
+            
             <button type="submit" className="shop-button shop-button--primary" disabled={isSaving}>
-              {isSaving ? "Saving changes..." : "Save profile"}
+              {!isEditing ? "Edit Profile" : isSaving ? "Saving..." : "Save Changes"}
             </button>
           </div>
         </form>
@@ -273,6 +303,7 @@ export function ShopProfilePage() {
 function getErrorMessage(error: any): string {
   return error?.response?.data?.message || "Something went wrong. Please try again.";
 }
+
 
 async function getCroppedImg(imageSrc: string, pixelCrop: any): Promise<Blob> {
   const image = new Image();

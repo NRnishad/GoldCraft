@@ -1,39 +1,30 @@
 import { Shop } from "@entities/Shop";
-import { IUpdateShopProfilePhotoRepository } from "./IShopRepository";
+import { IShopRepository } from "./IShopRepository";
 
-export interface UpdateShopProfilePhotoInput {
+export interface UpdateShopProfileInput {
   ownerUserId: string;
-  profilePhotoKey: string;
-  profilePhotoUrl: string;
+  shopName?: string;
+  phone?: string;
+  city?: string;
+  address?: string;
+  tagline?: string;
 }
 
-export interface UpdateShopProfilePhotoOutput {
+export interface UpdateShopProfileOutput {
   shop: Shop;
 }
 
-export class UpdateShopProfilePhotoUseCase {
-  constructor(private readonly shopRepository: IUpdateShopProfilePhotoRepository) {}
+export class UpdateShopProfileUseCase {
+  constructor(private readonly shopRepository: IShopRepository) {}
 
-  async execute(
-    input: UpdateShopProfilePhotoInput,
-  ): Promise<UpdateShopProfilePhotoOutput> {
-    const profilePhotoKey = input.profilePhotoKey.trim();
-    const profilePhotoUrl = input.profilePhotoUrl.trim();
-
-    const expectedPrefix = `shops/${input.ownerUserId}/profile/`;
-
-    if (!profilePhotoKey.startsWith(expectedPrefix)) {
-      throw new Error("INVALID_PROFILE_PHOTO_KEY");
-    }
-
-    if (!profilePhotoUrl) {
-      throw new Error("INVALID_PROFILE_PHOTO_URL");
-    }
-
-    const shop = await this.shopRepository.updateProfilePhoto({
+  async execute(input: UpdateShopProfileInput): Promise<UpdateShopProfileOutput> {
+    const shop = await this.shopRepository.updateProfile({
       ownerUserId: input.ownerUserId,
-      profilePhotoKey,
-      profilePhotoUrl,
+      shopName: input.shopName,
+      phone: input.phone,
+      city: input.city,
+      address: input.address,
+      tagline: input.tagline,
     });
 
     if (!shop) {
