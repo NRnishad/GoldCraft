@@ -16,17 +16,17 @@ export class UpdateShopRateOverrideUseCase {
   public async execute(input: IShopRateOverrideInput): Promise<void> {
     this.logger.info(`Jeweller updating rate override for today (User ID: ${input.userId})`);
 
-    // ✅ FIX 1: Match the exact schema field (ownerUserId)
+    
     const shop = await ShopModel.findOne({ ownerUserId: input.userId }).lean();
     if (!shop) {
       throw new AppError(404, 'Shop profile not found for this user');
     }
 
     const today = new Date();
-    // ✅ FIX 2: Use UTC midnight so it perfectly matches the dashboard query
+   
     today.setUTCHours(0, 0, 0, 0);
 
-    // Upsert the override for this specific shop and date
+   
     await JewellerRateOverrideModel.findOneAndUpdate(
       { shopId: shop._id, date: today },
       {

@@ -110,7 +110,7 @@ export function ShopProfilePage() {
       });
 
       setSuccessMessage("Shop profile updated successfully.");
-      setIsEditing(false); // [NEW] Lock the form again after successful save
+      setIsEditing(false); 
     } catch (error) {
       setErrorMessage(getErrorMessage(error));
     } finally {
@@ -120,7 +120,6 @@ export function ShopProfilePage() {
 
   // --- IMAGE UPLOAD LOGIC ---
   function onFileChange(e: ChangeEvent<HTMLInputElement>) {
-    // [NEW] Don't allow photo changes if not in edit mode
     if (!isEditing) return;
 
     if (e.target.files && e.target.files.length > 0) {
@@ -174,7 +173,7 @@ export function ShopProfilePage() {
       {shop && (
         <div className="shop-profile-summary">
           <div className="shop-profile-summary__avatar" style={{ position: 'relative', overflow: 'hidden' }}>
-            {/* [NEW] Only show pointer cursor and Edit overlay if in edit mode */}
+
             <label htmlFor="photo-upload" style={{ cursor: isEditing ? 'pointer' : 'default', display: 'block', width: '100%', height: '100%' }}>
               <img 
                  src={shop.profilePhotoUrl || "https://heerabhai.com/wp-content/uploads/2025/01/necklace.png"} 

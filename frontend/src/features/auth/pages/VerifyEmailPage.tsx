@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
@@ -23,6 +23,25 @@ export function VerifyEmailPage() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  // --- NEW: Timer States ---
+  const [resendTimer, setResendTimer] = useState<number>(60); 
+  const [expiryTimer, setExpiryTimer] = useState<number>(120); 
+
+  // --- NEW: Countdown Effect ---
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setResendTimer((prev) => (prev > 0 ? prev - 1 : 0));
+      setExpiryTimer((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s < 10 ? "0" : ""}${s}`;
+  };
 
   function handleOtpChange(event: ChangeEvent<HTMLInputElement>) {
     const onlyNumbers = event.target.value.replace(/\D/g, "");
@@ -51,6 +70,11 @@ export function VerifyEmailPage() {
 
     if (otp.length !== 6) {
       setErrorMessage("OTP must be 6 digits.");
+      return;
+    }
+
+    if (expiryTimer === 0) {
+      setErrorMessage("This OTP has expired. Please request a new one.");
       return;
     }
 
@@ -92,6 +116,10 @@ export function VerifyEmailPage() {
       await authApi.resendEmailVerification(cleanEmail);
 
       setSuccessMessage("A new verification OTP has been sent to your email.");
+
+      setResendTimer(60); 
+      setExpiryTimer(600); 
+
     } catch (error) {
       setErrorMessage(getErrorMessage(error));
     } finally {
@@ -192,10 +220,23 @@ export function VerifyEmailPage() {
               />
             </label>
 
+            {/* --- NEW: Expiry Timer UI --- */}
+            <div style={{ marginTop: "-10px", marginBottom: "15px", fontSize: "13px" }}>
+              {expiryTimer > 0 ? (
+                <span style={{ color: "#64748b" }}>
+                  OTP expires in <strong>{formatTime(expiryTimer)}</strong>
+                </span>
+              ) : (
+                <span style={{ color: "#ef4444", fontWeight: "500" }}>
+                  OTP has expired. Please resend.
+                </span>
+              )}
+            </div>
+
             <button
               type="submit"
               className="login-form__submit"
-              disabled={isVerifying}
+              disabled={isVerifying || expiryTimer === 0}
             >
               {isVerifying ? "Verifying..." : "Verify email"}
             </button>
@@ -205,9 +246,13 @@ export function VerifyEmailPage() {
             type="button"
             className="login-card__secondary-button"
             onClick={handleResendOtp}
-            disabled={isResending}
+            disabled={isResending || resendTimer > 0}
           >
-            {isResending ? "Sending OTP..." : "Resend OTP"}
+            {isResending 
+              ? "Sending OTP..." 
+              : resendTimer > 0 
+                ? `Resend OTP in ${resendTimer}s` 
+                : "Resend OTP"}
           </button>
 
           <p className="login-card__footer-text">
