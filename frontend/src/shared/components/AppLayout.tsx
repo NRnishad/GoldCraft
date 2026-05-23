@@ -1,36 +1,52 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import { logoutUser } from "../../features/auth/store/authSlice";
+import { shopApi } from "../../features/shop/api/shopApi"; // [NEW] Import shop API
 
 import "./AppLayout.css";
 
+// [NEW] Added a condition property to the NavItem interface
 interface NavItem {
   label: string;
   to: string;
   roles?: Array<"jeweller" | "admin">;
+  condition?: (isOnboarded: boolean) => boolean; 
 }
 
 const navItems: NavItem[] = [
   {
-  label: "Dashboard",
-  to: "/dashboard",
-},
+    label: "Dashboard",
+    to: "/dashboard",
+  },
   {
     label: "Shop Onboarding",
     to: "/shop/onboarding",
     roles: ["jeweller"],
+    condition: (isOnboarded) => !isOnboarded, 
   },
   {
     label: "Shop Profile",
     to: "/shop/profile",
     roles: ["jeweller"],
+    condition: (isOnboarded) => isOnboarded, 
   },
   {
-    label: "Admin Users",
+    label: "Rates Dashboard",
+    to: "/shop/rates",
+    roles: ["jeweller"],
+    condition: (isOnboarded) => isOnboarded, 
+  },
+  {
+    label: "Users",
     to: "/admin/users",
+    roles: ["admin"],
+  },
+  {
+    label: "Rates",
+    to: "/admin/rates",
     roles: ["admin"],
   },
   {
@@ -47,17 +63,26 @@ export function AppLayout() {
   const isLoading = useAppSelector((state) => state.auth.isLoading);
 
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
+ 
+  const [isOnboardingComplete, setIsOnboardingComplete] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (user?.role === 'jeweller') {
+      shopApi.getOnboardingState().then((res) => {
+        setIsOnboardingComplete(res.data.data.onboardingComplete);
+      }).catch(err => console.error("Failed to fetch onboarding state", err));
+    }
+  }, [user]);
 
   const visibleNavItems = navItems.filter((item) => {
-    if (!item.roles) {
-      return true;
-    }
-
-    if (!user) {
+    if (item.roles && (!user || !item.roles.includes(user.role))) {
       return false;
     }
-
-    return item.roles.includes(user.role);
+    if (item.condition) {
+      return item.condition(isOnboardingComplete);
+    }
+    return true;
   });
 
   async function handleLogout() {
@@ -70,6 +95,7 @@ export function AppLayout() {
   }
 
   return (
+    // ... Keep the entire rest of your AppLayout JSX return statement exactly the same ...
     <div className="app-shell">
       <aside
         className={
@@ -84,7 +110,7 @@ export function AppLayout() {
 
             <span>
               <strong>GoldCraft</strong>
-              <small>Dashboard</small>
+              
             </span>
           </Link>
 
@@ -157,8 +183,8 @@ export function AppLayout() {
           </button>
 
           <div>
-            <p className="app-shell__topbar-eyebrow">GoldCraft workspace</p>
-            <h1>Dashboard</h1>
+            <h1 className="app-shell__topbar-eyebrow">Workspace</h1>
+            
           </div>
 
           {user && (

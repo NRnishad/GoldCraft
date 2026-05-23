@@ -8,6 +8,4 @@ export async function checkRedisConnection(): Promise<void> {
   });
 
   await redis.ping();
-
-  console.log("Redis connected");
 }

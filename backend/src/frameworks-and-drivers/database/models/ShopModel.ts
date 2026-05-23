@@ -63,6 +63,7 @@ const ShopSchema = new Schema<IShopDocument>(
 profilePhotoUrl: {
   type: String,
   trim: true,
+  default: "https://heerabhai.com/wp-content/uploads/2025/01/necklace.png"
 },
   },
   {

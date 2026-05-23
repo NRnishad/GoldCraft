@@ -6,6 +6,7 @@ import {
   makeSaveOnboardingUseCase,
  makeCreateProfilePhotoUploadUrlUseCase,
 makeUpdateShopProfilePhotoUseCase,
+makeUpdateShopProfileUseCase
 } from "../factories/ShopFactory";
 import {
   onboardingSchema,
@@ -143,7 +144,15 @@ export const ShopController = {
       throw new AppError("File name is required", 400, "FILE_NAME_REQUIRED");
     }
 
-    mapShopNotFound(error);
+    if (error instanceof Error && error.message === "SHOP_NOT_FOUND") {
+      throw new AppError(
+        "Shop profile not found. Please complete onboarding first",
+        404,
+        "SHOP_NOT_FOUND",
+      );
+    }
+
+    throw error;
   }
 },
 
@@ -160,29 +169,27 @@ async updateProfilePhoto(req: AuthRequest, res: Response) {
 
     return sendSuccess(res, "Profile photo updated", result);
   } catch (error) {
-    if (
-      error instanceof Error &&
-      error.message === "INVALID_PROFILE_PHOTO_KEY"
-    ) {
+    if (error instanceof Error && error.message === "UNSUPPORTED_FILE_TYPE") {
       throw new AppError(
-        "Invalid profile photo key",
+        "Only JPG, PNG, and WebP images are allowed",
         400,
-        "INVALID_PROFILE_PHOTO_KEY",
+        "UNSUPPORTED_FILE_TYPE",
       );
     }
 
-    if (
-      error instanceof Error &&
-      error.message === "INVALID_PROFILE_PHOTO_URL"
-    ) {
+    if (error instanceof Error && error.message === "FILE_NAME_REQUIRED") {
+      throw new AppError("File name is required", 400, "FILE_NAME_REQUIRED");
+    }
+
+    if (error instanceof Error && error.message === "SHOP_NOT_FOUND") {
       throw new AppError(
-        "Invalid profile photo URL",
-        400,
-        "INVALID_PROFILE_PHOTO_URL",
+        "Shop profile not found. Please complete onboarding first",
+        404,
+        "SHOP_NOT_FOUND",
       );
     }
 
-    mapShopNotFound(error);
+    throw error;
   }
 },
   

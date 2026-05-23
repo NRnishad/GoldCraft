@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
@@ -23,9 +23,29 @@ export function ResetPasswordPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isResending, setIsResending] = useState(false);
 
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const [resendTimer, setResendTimer] = useState<number>(60); 
+  const [expiryTimer, setExpiryTimer] = useState<number>(120); 
+
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setResendTimer((prev) => (prev > 0 ? prev - 1 : 0));
+      setExpiryTimer((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m}:${s < 10 ? "0" : ""}${s}`;
+  };
 
   function handleEmailChange(event: ChangeEvent<HTMLInputElement>) {
     setEmail(event.target.value);
@@ -57,6 +77,31 @@ export function ResetPasswordPage() {
     setSuccessMessage(null);
   }
 
+  async function handleResendOtp() {
+    const cleanEmail = email.trim();
+
+    if (!cleanEmail) {
+      setErrorMessage("Enter your email address before requesting a new OTP.");
+      return;
+    }
+
+    try {
+      setIsResending(true);
+      clearMessages();
+      await authApi.forgotPassword({ email: cleanEmail });
+
+      setSuccessMessage("A new password reset OTP has been sent to your email.");
+      
+      setResendTimer(60); 
+      setExpiryTimer(120); 
+
+    } catch (error) {
+      setErrorMessage(getErrorMessage(error));
+    } finally {
+      setIsResending(false);
+    }
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -67,6 +112,11 @@ export function ResetPasswordPage() {
 
     if (otp.length !== 6) {
       setErrorMessage("OTP must be 6 digits.");
+      return;
+    }
+
+    if (expiryTimer === 0) {
+      setErrorMessage("This OTP has expired. Please request a new one.");
       return;
     }
 
@@ -270,17 +320,46 @@ export function ResetPasswordPage() {
               </div>
             </label>
 
+           
+            <div style={{ marginTop: "-10px", marginBottom: "15px", fontSize: "13px" }}>
+              {expiryTimer > 0 ? (
+                <span style={{ color: "#64748b" }}>
+                  OTP expires in <strong>{formatTime(expiryTimer)}</strong>
+                </span>
+              ) : (
+                <span style={{ color: "#ef4444", fontWeight: "500" }}>
+                  OTP has expired. Please request a new one.
+                </span>
+              )}
+            </div>
+
             <button
               type="submit"
               className="login-form__submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || expiryTimer === 0}
             >
               {isSubmitting ? "Resetting password..." : "Reset password"}
             </button>
           </form>
 
-          <p className="login-card__footer-text">
-            Need a new OTP? <Link to="/forgot-password">Request again</Link>
+         
+          <button
+            type="button"
+            className="login-card__secondary-button"
+            onClick={handleResendOtp}
+            disabled={isResending || resendTimer > 0}
+            style={{ marginTop: "1rem" }}
+          >
+            {isResending 
+              ? "Sending OTP..." 
+              : resendTimer > 0 
+                ? `Resend OTP in ${resendTimer}s` 
+                : "Resend OTP"}
+          </button>
+          
+         
+          <p className="login-card__footer-text" style={{ marginTop: "1rem" }}>
+            Wrong email? <Link to="/forgot-password">Start over</Link>
           </p>
         </div>
       </section>

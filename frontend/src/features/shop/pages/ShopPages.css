@@ -291,3 +291,119 @@
     border-radius: 18px;
   }
 }
+
+/* --- Shop Rates Dashboard Styles --- */
+.dashboard-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.alert-warning {
+  background-color: #fff3cd;
+  color: #856404;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  font-weight: 500;
+}
+
+.rate-display-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.rate-box-primary, .rate-box-secondary {
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  text-align: center;
+}
+
+.rate-box-primary {
+  background-color: #fdfbf7;
+  border-color: #d4af37;
+}
+
+.rate-box-secondary {
+  background-color: #ffffff;
+}
+
+.rate-box-primary h3, .rate-box-secondary h3 {
+  font-size: 1rem;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.rate-box-primary h2 {
+  font-size: 2.5rem;
+  color: #d4af37;
+  margin-bottom: 0.25rem;
+}
+
+.rate-box-secondary h2 {
+  font-size: 2.25rem;
+  color: #1e293b;
+  margin-bottom: 0.25rem;
+}
+
+.subtext {
+  font-size: 0.875rem;
+  color: #94a3b8;
+}
+
+.override-section {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.override-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-group label {
+  font-weight: 500;
+  color: #334155;
+}
+
+.form-group input {
+  padding: 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.btn-primary-rate {
+  background-color: #d4af37;
+  color: white;
+  padding: 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-primary-rate:hover:not(:disabled) {
+  background-color: #bfa030;
+}
+
+.btn-primary-rate:disabled {
+  background-color: #e2e8f0;
+  cursor: not-allowed;
+}
