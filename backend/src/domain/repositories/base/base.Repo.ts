@@ -1,0 +1,12 @@
+import { Result } from "@domain/shared/Result";
+
+export interface IWrite<T> {
+  create(data: T): Promise<Result<T>>;
+  update(id: string, data: T): Promise<Result<T>>;
+  delete(id: string): Promise<Result<void>>;
+}
+
+export interface IRead<T, IReadFiltersInput> {
+  findAll(data: IReadFiltersInput): Promise<Result<T[] | []>>;
+  findById(id: string): Promise<Result<T | null>>;
+}
