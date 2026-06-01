@@ -1,0 +1,9 @@
+import { Shop } from "@entities/Shop";
+
+export interface IUpdateShopProfilePhotoRepository {
+  updateProfilePhoto(input: {
+    ownerUserId: string;
+    profilePhotoKey: string;
+    profilePhotoUrl: string;
+  }): Promise<Shop | null>;
+}
